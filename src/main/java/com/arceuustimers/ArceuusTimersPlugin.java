@@ -6,18 +6,14 @@ import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-
 import net.runelite.api.Skill;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.VarbitChanged;
-
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.events.GameStateChanged;
-
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
@@ -26,7 +22,7 @@ import net.runelite.client.util.ImageUtil;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Locale;
+
 
 
 @Slf4j
@@ -36,8 +32,6 @@ import java.util.Locale;
 public class ArceuusTimersPlugin extends Plugin
 {
 
-
-	private boolean summonLock = false;
 	ArceuusSpellEnums thrallImage = ArceuusSpellEnums.Ghost;
 	ArceuusSpellEnums corruptionImage = ArceuusSpellEnums.Greater;
 	HashMap<ArceuusSpellEnums, Boolean> spellActive = new HashMap<>();
@@ -80,7 +74,7 @@ public class ArceuusTimersPlugin extends Plugin
 
 		log.info("Arceuus Timers plugin stopped!");
 		overlayManager.remove(overlay);
-		//Remove only the infoboxes that could be possible
+		//Only remove InfoBoxes that are created by this plugin
 		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.SHADOW));
 		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.SUMMON));
 		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.VIGOUR));
