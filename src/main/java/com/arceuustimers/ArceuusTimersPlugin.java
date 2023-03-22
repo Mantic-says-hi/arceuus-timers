@@ -3,6 +3,7 @@ package com.arceuustimers;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 
+
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 
@@ -10,10 +11,13 @@ import net.runelite.api.Skill;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
+
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
+
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
@@ -32,12 +36,14 @@ import java.util.Locale;
 public class ArceuusTimersPlugin extends Plugin
 {
 
+
 	private boolean summonLock = false;
 	ArceuusSpellEnums thrallImage = ArceuusSpellEnums.Ghost;
 	ArceuusSpellEnums corruptionImage = ArceuusSpellEnums.Greater;
 	HashMap<ArceuusSpellEnums, Boolean> spellActive = new HashMap<>();
 	HashMap<ArceuusSpellEnums, InfoBox> activeInfoBox = new HashMap<>();
 	HashMap<ArceuusSpellEnums, String> filename = new HashMap<>();
+
 
 	@Inject
 	private Client client;
@@ -66,11 +72,12 @@ public class ArceuusTimersPlugin extends Plugin
 		//Turn off 'Timers' plugin implementation
 		configManager.setConfiguration("timers", "showArceuus", false);
 		configManager.setConfiguration("timers", "showArceuusCooldown", false);
-	}
+   }
 
 	@Override
 	protected void shutDown() throws Exception
 	{
+
 		log.info("Arceuus Timers plugin stopped!");
 		overlayManager.remove(overlay);
 		//Remove only the infoboxes that could be possible
@@ -186,6 +193,7 @@ public class ArceuusTimersPlugin extends Plugin
 
 		infoBoxManager.addInfoBox(box);
 		activeInfoBox.replace(identifier, box);
+
 	}
 
 	@Provides
@@ -252,4 +260,5 @@ public class ArceuusTimersPlugin extends Plugin
 		filename.put(ArceuusSpellEnums.Lesser,"/lesser.png");
 		filename.put(ArceuusSpellEnums.Greater,"/greater.png");
 	}
+  
 }

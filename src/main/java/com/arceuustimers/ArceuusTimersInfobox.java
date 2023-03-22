@@ -1,5 +1,6 @@
 package com.arceuustimers;
 
+
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxPriority;
@@ -67,4 +68,5 @@ public class ArceuusTimersInfobox extends InfoBox
 	{
 		return false;
 	}
+  
 }
