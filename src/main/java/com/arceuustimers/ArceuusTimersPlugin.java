@@ -85,37 +85,37 @@ public class ArceuusTimersPlugin extends Plugin
 	{
 
 		//Death charge cooldown | varbit = 12138 | 1 = On Cooldown
-		int chargeCooldownBit = client.getVarbitValue( Varbits.DEATH_CHARGE_COOLDOWN );
+		final int chargeCooldownBit = client.getVarbitValue( Varbits.DEATH_CHARGE_COOLDOWN );
 		updateInfoBox(chargeCooldownBit, ArceuusSpell.CHARGE_COOLDOWN);
 
 
 		//Death charge | varbit = 12411 | 1 = Active
-		int chargeActiveBit = client.getVarbitValue( Varbits.DEATH_CHARGE );
+		final int chargeActiveBit = client.getVarbitValue( Varbits.DEATH_CHARGE );
 		updateInfoBox(chargeActiveBit, ArceuusSpell.CHARGE);
 
 
 		//Corruption | varbit = 12288 | 1 = Cooling down
-		int corruptionCooldownBit = client.getVarbitValue(Varbits.CORRUPTION_COOLDOWN);
+		final int corruptionCooldownBit = client.getVarbitValue(Varbits.CORRUPTION_COOLDOWN);
 		updateInfoBox(corruptionCooldownBit, ArceuusSpell.CORRUPTION);
 
 
 		//Thrall Cooldown | varbit = 12290 | 1 = Cooling down
-		int thrallCooldownBit = client.getVarbitValue(Varbits.RESURRECT_THRALL_COOLDOWN);
+		final int thrallCooldownBit = client.getVarbitValue(Varbits.RESURRECT_THRALL_COOLDOWN);
 		updateInfoBox(thrallCooldownBit, ArceuusSpell.THRALL_COOLDOWN);
 
 
 		//Active Thrall | varbit = 12413 | 1 = Summon active
-		int thrallActive = client.getVarbitValue(Varbits.RESURRECT_THRALL);
+		final int thrallActive = client.getVarbitValue(Varbits.RESURRECT_THRALL);
 		updateInfoBox(thrallActive, ArceuusSpell.THRALL);
 
 
 		//Vile Vigour | varbit = 12292 | 1 = Active
-		int vigourBit = client.getVarbitValue(12292);
+		final int vigourBit = client.getVarbitValue(12292);
 		updateInfoBox(vigourBit, ArceuusSpell.VIGOUR);
 
 
 		//Shadow Veil | varbit : 12414 | 1 = Active
-		int shadowBit = client.getVarbitValue( Varbits.SHADOW_VEIL );
+		final int shadowBit = client.getVarbitValue( Varbits.SHADOW_VEIL );
 		updateInfoBox(shadowBit, ArceuusSpell.SHADOW);
 
 	}
@@ -148,7 +148,7 @@ public class ArceuusTimersPlugin extends Plugin
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked cast)
 	{
-		String option = cast.getMenuTarget();
+		final String option = cast.getMenuTarget();
 		if(option.contains("Ghost")) {
 			SpellData changeData = data.get(ArceuusSpell.THRALL);
 			changeData.setFileName("/ghost.png");
@@ -257,6 +257,7 @@ public class ArceuusTimersPlugin extends Plugin
 	private void setupHashMaps()
 	{
 
+		/*Enum setup*/
 		//THRALL
 		//THRALL_COOLDOWN
 		//CHARGE
@@ -265,7 +266,7 @@ public class ArceuusTimersPlugin extends Plugin
 		//VIGOUR
 		//CORRUPTION
 
-		String[] filenames = {
+		final String[] filenames = {
 				"/ghost.png",//THRALL
 				"/thrall_cooldown.png",//THRALL_COOLDOWN
 				"/death_charge.png",//CHARGE
@@ -275,7 +276,7 @@ public class ArceuusTimersPlugin extends Plugin
 				"/greater.png"//CORRUPTION
 		};
 
-		double[] cooldowns = {
+		final double[] cooldowns = {
 				-1.0,//THRALL
 				11.0,//THRALL_COOLDOWN
 				-1.0,//CHARGE
@@ -285,7 +286,7 @@ public class ArceuusTimersPlugin extends Plugin
 				31.0//CORRUPTION
 		};
 
-		String[] tooltips = {
+		final String[] tooltips = {
 				"Active thrall ( Ghost )",//THRALL
 				"Thrall cooldown",//THRALL_COOLDOWN
 				"Death Charge active",//CHARGE
