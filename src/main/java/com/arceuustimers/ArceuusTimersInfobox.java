@@ -16,7 +16,6 @@ public class ArceuusTimersInfobox extends InfoBox
 	private double time;
 	private Instant start;
 	private Instant end;
-	private ArceuusSpellEnums identifier;
 	private long left;
 	InfoBoxManager manager;
 

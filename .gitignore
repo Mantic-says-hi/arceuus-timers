@@ -4,6 +4,8 @@ build
 .project
 .settings/
 .classpath
+out
+Old icons
 nbactions.xml
 nb-configuration.xml
 nbproject/

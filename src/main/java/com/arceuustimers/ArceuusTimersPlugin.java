@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.Varbits;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.config.ConfigManager;
@@ -22,22 +23,17 @@ import net.runelite.client.util.ImageUtil;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Locale;
 
 
 @Slf4j
 @PluginDescriptor(
-	name = "Arceuus Timers"
+	name = "Arceuus Timers",
+	description = "Arceuus spellbook timers with an alternate design to the 'Timers' plugin."
 )
 public class ArceuusTimersPlugin extends Plugin
 {
 
-	ArceuusSpellEnums thrallImage = ArceuusSpellEnums.Ghost;
-	ArceuusSpellEnums corruptionImage = ArceuusSpellEnums.Greater;
-	HashMap<ArceuusSpellEnums, Boolean> spellActive = new HashMap<>();
-	HashMap<ArceuusSpellEnums, InfoBox> activeInfoBox = new HashMap<>();
-	HashMap<ArceuusSpellEnums, String> filename = new HashMap<>();
-
+	HashMap<ArceuusSpell, SpellData> data = new HashMap<>();
 
 	@Inject
 	private Client client;
@@ -75,11 +71,10 @@ public class ArceuusTimersPlugin extends Plugin
 		log.info("Arceuus Timers plugin stopped!");
 		overlayManager.remove(overlay);
 		//Only remove InfoBoxes that are created by this plugin
-		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.SHADOW));
-		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.SUMMON));
-		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.VIGOUR));
-		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.CHARGE));
-		infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.CORRUPTION));
+		for (ArceuusSpell spell : ArceuusSpell.values())
+		{
+			infoBoxManager.removeInfoBox(data.get(spell).getInfoBox());
+		}
 		//Turn on 'Timers' plugin implementation to replace this one
 		configManager.setConfiguration("timers", "showArceuus", true);
 		configManager.setConfiguration("timers", "showArceuusCooldown", true);
@@ -88,115 +83,59 @@ public class ArceuusTimersPlugin extends Plugin
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		//Death charge | varbit = 12138 | 1 = On Cooldown
-		int chargeBit = client.getVarbitValue( Varbits.DEATH_CHARGE_COOLDOWN );
-		if( chargeBit == 1 && !spellActive.get( ArceuusSpellEnums.CHARGE ) )
-		{
-			double chargeCooldownTime = 61.0;
-			onSpellCast(chargeCooldownTime, ArceuusSpellEnums.CHARGE, filename.get(ArceuusSpellEnums.CHARGE),
-					"Death Charge cooldown");
-			spellActive.replace(ArceuusSpellEnums.CHARGE,true);
-		}
-		else if( chargeBit == 0 && spellActive.get(ArceuusSpellEnums.CHARGE))
-		{
-			removeBox(ArceuusSpellEnums.CHARGE);
-		}
+
+		//Death charge cooldown | varbit = 12138 | 1 = On Cooldown
+		int chargeCooldownBit = client.getVarbitValue( Varbits.DEATH_CHARGE_COOLDOWN );
+		updateInfoBox(chargeCooldownBit, ArceuusSpell.CHARGE_COOLDOWN);
+
+
+		//Death charge | varbit = 12411 | 1 = Active
+		int chargeActiveBit = client.getVarbitValue( Varbits.DEATH_CHARGE );
+		updateInfoBox(chargeActiveBit, ArceuusSpell.CHARGE);
 
 
 		//Corruption | varbit = 12288 | 1 = Cooling down
-		int corruptionBit = client.getVarbitValue(Varbits.CORRUPTION_COOLDOWN);
-		if(corruptionBit == 1 && !spellActive.get( ArceuusSpellEnums.CORRUPTION ) )
-		{
-			double corruptionCooldownTime = 31.0;
-			onSpellCast(corruptionCooldownTime,ArceuusSpellEnums.CORRUPTION, filename.get(corruptionImage),
-					    corruptionImage.toString() + " Corruption cooldown");
-			spellActive.replace(ArceuusSpellEnums.CORRUPTION, true);
-		}
-		else if ( corruptionBit == 0 && spellActive.get(ArceuusSpellEnums.CORRUPTION))
-		{
-			removeBox(ArceuusSpellEnums.CORRUPTION);
-		}
+		int corruptionCooldownBit = client.getVarbitValue(Varbits.CORRUPTION_COOLDOWN);
+		updateInfoBox(corruptionCooldownBit, ArceuusSpell.CORRUPTION);
 
-		//Summon Thrall | varbit = 12290 | 1 = Cooling down
-		int summonCooldownBit = client.getVarbitValue(Varbits.RESURRECT_THRALL_COOLDOWN);
-		if(summonCooldownBit == 1 && spellActive.get(ArceuusSpellEnums.THRALL_COOLDOWN))
-		{
-			double summonCooldownTime = 11.0;
-			onSpellCast(summonCooldownTime, ArceuusSpellEnums.THRALL_COOLDOWN,
-					filename.get(ArceuusSpellEnums.THRALL_COOLDOWN), "Thrall cooldown");
-			spellActive.replace(ArceuusSpellEnums.THRALL_COOLDOWN, true);
-		}
-		else if ( summonCooldownBit == 0 && spellActive.get(ArceuusSpellEnums.THRALL_COOLDOWN))
-		{
-			removeBox(ArceuusSpellEnums.THRALL_COOLDOWN);
-		}
+
+		//Thrall Cooldown | varbit = 12290 | 1 = Cooling down
+		int thrallCooldownBit = client.getVarbitValue(Varbits.RESURRECT_THRALL_COOLDOWN);
+		updateInfoBox(thrallCooldownBit, ArceuusSpell.THRALL_COOLDOWN);
+
+
+		//Active Thrall | varbit = 12413 | 1 = Summon active
+		int thrallActive = client.getVarbitValue(Varbits.RESURRECT_THRALL);
+		updateInfoBox(thrallActive, ArceuusSpell.THRALL);
 
 
 		//Vile Vigour | varbit = 12292 | 1 = Active
 		int vigourBit = client.getVarbitValue(12292);
-		if( vigourBit == 1 && !spellActive.get(ArceuusSpellEnums.VIGOUR))
-		{
-			double vigourCooldownTime = 11.0;
-			onSpellCast(vigourCooldownTime, ArceuusSpellEnums.VIGOUR, filename.get(ArceuusSpellEnums.VIGOUR),
-					    "Vile Vigour cooldown");
-			spellActive.replace(ArceuusSpellEnums.VIGOUR,true);
-		}
-		else if( vigourBit == 0 && spellActive.get(ArceuusSpellEnums.VIGOUR) )
-		{
-			removeBox(ArceuusSpellEnums.VIGOUR);
-		}
-
-		//Active Thrall | varbit = 12413 | 1 = Summon active
-		int thrallActive = client.getVarbitValue(Varbits.RESURRECT_THRALL);
-		if(thrallActive == 1 && !spellActive.get( ArceuusSpellEnums.SUMMON ))
-		{
-			double thrallUptime = 0.6 * client.getBoostedSkillLevel(Skill.MAGIC);
-			if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_GRANDMASTER ) == 2)
-			{
-				thrallUptime = ( thrallUptime * 2.0 );
-			}
-			else if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_MASTER ) == 2)
-			{
-				thrallUptime = ( thrallUptime * 1.5 );
-			}
-
-			onSpellCast( (thrallUptime), ArceuusSpellEnums.SUMMON, filename.get(thrallImage),
-					"Active thrall ( " +thrallImage.toString()+" )");
-			spellActive.replace(ArceuusSpellEnums.SUMMON,true);
-
-		}
-		else if(thrallActive == 0 && spellActive.get(ArceuusSpellEnums.SUMMON))
-		{
-			removeBox(ArceuusSpellEnums.SUMMON);
-		}
+		updateInfoBox(vigourBit, ArceuusSpell.VIGOUR);
 
 
 		//Shadow Veil | varbit : 12414 | 1 = Active
 		int shadowBit = client.getVarbitValue( Varbits.SHADOW_VEIL );
-		if( shadowBit == 1 && !spellActive.get( ArceuusSpellEnums.SHADOW ) )
-		{
-			infoBoxManager.removeInfoBox(activeInfoBox.get(ArceuusSpellEnums.SHADOW));
-			double shadowTime = 61.0;
-			onSpellCast(shadowTime, ArceuusSpellEnums.SHADOW, filename.get(ArceuusSpellEnums.SHADOW),
-					    "Shadow Veil active");
-			spellActive.replace(ArceuusSpellEnums.SHADOW,true);
-		}
-		else if( shadowBit == 0 && spellActive.get(ArceuusSpellEnums.SHADOW) )
-		{
-			removeBox(ArceuusSpellEnums.SHADOW);
-		}
+		updateInfoBox(shadowBit, ArceuusSpell.SHADOW);
 
 	}
 
-
-	public void onSpellCast(double time, ArceuusSpellEnums identifier, String filename, String tooltip)
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
 	{
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), filename);
-		InfoBox box = new ArceuusTimersInfobox(icon, this, time, infoBoxManager,
-				                               Instant.now(), tooltip);
+		final String message = event.getMessage();
 
-		infoBoxManager.addInfoBox(box);
-		activeInfoBox.replace(identifier, box);
+		if(message.contains("Your thieving abilities have been enhanced."))
+		{
+			SpellData spellData = data.get(ArceuusSpell.SHADOW);
+			if(spellData.isActive())
+			{
+				removeBox(ArceuusSpell.SHADOW);
+				double shadowTime = 0.6 * client.getRealSkillLevel(Skill.MAGIC);
+				spellData.setCooldown(shadowTime);
+				onSpellCast(spellData);
+			}
+		}
 
 	}
 
@@ -209,63 +148,159 @@ public class ArceuusTimersPlugin extends Plugin
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked cast)
 	{
-
-
 		String option = cast.getMenuTarget();
-
 		if(option.contains("Ghost")) {
-			thrallImage = ArceuusSpellEnums.Ghost;
+			SpellData changeData = data.get(ArceuusSpell.THRALL);
+			changeData.setFileName("/ghost.png");
+			changeData.setTooltip("Active thrall ( Ghost )");
 			return;
 		}
 		if(option.contains("Skeleton")) {
-			thrallImage = ArceuusSpellEnums.Skeleton;
+			SpellData changeData = data.get(ArceuusSpell.THRALL);
+			changeData.setFileName("/skeleton.png");
+			changeData.setTooltip("Active thrall ( Skeleton )");
 			return;
 		}
 		if(option.contains("Zombie")){
-			thrallImage = ArceuusSpellEnums.Zombie;
+			SpellData changeData = data.get(ArceuusSpell.THRALL);
+			changeData.setFileName("/zombie.png");
+			changeData.setTooltip("Active thrall ( Zombie )");
 			return;
 		}
 		if(option.contains("Greater")) {
-			corruptionImage = ArceuusSpellEnums.Greater;
+			SpellData changeFile = data.get(ArceuusSpell.CORRUPTION);
+			changeFile.setFileName("/greater.png");
 			return;
 		}
 		if(option.contains("Lesser")){
-			corruptionImage = ArceuusSpellEnums.Lesser;
+			SpellData changeFile = data.get(ArceuusSpell.CORRUPTION);
+			changeFile.setFileName("/lesser.png");
 		}
-
 	}
 
-
-	public void removeBox(ArceuusSpellEnums identifier)
+	public void onSpellCast(SpellData spellData)
 	{
-		spellActive.replace(identifier, false);
-		infoBoxManager.removeInfoBox(activeInfoBox.get(identifier));
-		activeInfoBox.replace(identifier,null);
+		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), spellData.getFileName());
+		InfoBox box = new ArceuusTimersInfobox(
+				icon,
+				this,
+				spellData.getCooldown(),
+				infoBoxManager,
+				Instant.now(),
+				spellData.getTooltip());
+
+		infoBoxManager.addInfoBox(box);
+		spellData.setInfoBox(box);
+		spellData.setActive(true);
+	}
+
+	public void updateInfoBox(int varbitValue, ArceuusSpell identifier)
+	{
+		SpellData spellData = data.get(identifier);
+		if(identifier.equals(ArceuusSpell.THRALL))
+		{
+			if(varbitValue == 1 && !spellData.isActive())
+			{
+				double thrallUptime = 0.6 * client.getBoostedSkillLevel(Skill.MAGIC);
+				if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_GRANDMASTER ) == 2)
+				{
+					thrallUptime = ( thrallUptime * 2.0 );
+				}
+				else if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_MASTER ) == 2)
+				{
+					thrallUptime = ( thrallUptime * 1.5 );
+				}
+				spellData.setCooldown(thrallUptime);
+				onSpellCast(spellData);
+			}
+			else if(varbitValue == 0 && spellData.isActive())
+			{
+				removeBox(identifier);
+			}
+			return;
+		}
+
+		if( identifier.equals(ArceuusSpell.SHADOW))
+		{
+			if( varbitValue == 1 && !spellData.isActive() )
+			{
+				double shadowTime = 0.6 * client.getRealSkillLevel(Skill.MAGIC);
+				spellData.setCooldown(shadowTime);
+				onSpellCast(spellData);
+			}
+			else if( varbitValue == 0 && spellData.isActive() )
+			{
+				removeBox(ArceuusSpell.SHADOW);
+			}
+			return;
+		}
+
+
+		if( varbitValue == 1 && !spellData.isActive() )
+		{
+			onSpellCast(spellData);
+		}
+		else if( varbitValue == 0 && spellData.isActive())
+		{
+			removeBox(identifier);
+		}
+	}
+
+	public void removeBox(ArceuusSpell identifier)
+	{
+		SpellData updateSpellData = data.get(identifier);
+		updateSpellData.setActive(false);
+		infoBoxManager.removeInfoBox(updateSpellData.getInfoBox());
+		updateSpellData.setInfoBox(null);
 	}
 
 	private void setupHashMaps()
 	{
-		spellActive.put(ArceuusSpellEnums.SUMMON,false);
-		spellActive.put(ArceuusSpellEnums.THRALL_COOLDOWN,false);
-		spellActive.put(ArceuusSpellEnums.CHARGE,false);
-		spellActive.put(ArceuusSpellEnums.SHADOW,false);
-		spellActive.put(ArceuusSpellEnums.VIGOUR,false);
-		spellActive.put(ArceuusSpellEnums.CORRUPTION,false);
-		activeInfoBox.put(ArceuusSpellEnums.SUMMON,null);
-		activeInfoBox.put(ArceuusSpellEnums.THRALL_COOLDOWN, null);
-		activeInfoBox.put(ArceuusSpellEnums.CHARGE,null);
-		activeInfoBox.put(ArceuusSpellEnums.SHADOW,null);
-		activeInfoBox.put(ArceuusSpellEnums.VIGOUR,null);
-		activeInfoBox.put(ArceuusSpellEnums.CORRUPTION,null);
-		filename.put(ArceuusSpellEnums.Ghost,"/ghost.png");
-		filename.put(ArceuusSpellEnums.Skeleton,"/skeleton.png");
-		filename.put(ArceuusSpellEnums.Zombie,"/zombie.png");
-		filename.put(ArceuusSpellEnums.THRALL_COOLDOWN,"/thrall_cooldown.png");
-		filename.put(ArceuusSpellEnums.CHARGE,"/death_charge.png");
-		filename.put(ArceuusSpellEnums.SHADOW,"/shadow_veil.png");
-		filename.put(ArceuusSpellEnums.VIGOUR,"/vile_vigour.png");
-		filename.put(ArceuusSpellEnums.Lesser,"/lesser.png");
-		filename.put(ArceuusSpellEnums.Greater,"/greater.png");
+
+		//THRALL
+		//THRALL_COOLDOWN
+		//CHARGE
+		//CHARGE_COOLDOWN
+		//SHADOW
+		//VIGOUR
+		//CORRUPTION
+
+		String[] filenames = {
+				"/ghost.png",//THRALL
+				"/thrall_cooldown.png",//THRALL_COOLDOWN
+				"/death_charge.png",//CHARGE
+				"/death_charge_cooldown.png",//CHARGE_COOLDOWN
+				"/shadow_veil.png",//SHADOW
+				"/vile_vigour.png",//VIGOUR
+				"/greater.png"//CORRUPTION
+		};
+
+		double[] cooldowns = {
+				-1.0,//THRALL
+				11.0,//THRALL_COOLDOWN
+				-1.0,//CHARGE
+				61.0,//CHARGE_COOLDOWN
+				-1.0,//SHADOW
+				11.0,//VIGOUR
+				31.0//CORRUPTION
+		};
+
+		String[] tooltips = {
+				"Active thrall ( Ghost )",//THRALL
+				"Thrall cooldown",//THRALL_COOLDOWN
+				"Death Charge active",//CHARGE
+				"Death Charge cooldown",//CHARGE_COOLDOWN
+				"Shadow Veil active",//SHADOW
+				"Vile Vigour cooldown",//VIGOUR
+				"Corruption cooldown"//CORRUPTION
+		};
+
+		for (int i = 0; i < ArceuusSpell.values().length; i++)
+		{
+			data.put(ArceuusSpell.values()[i],
+					new SpellData(false,null,filenames[i], cooldowns[i],tooltips[i]));
+		}
+
 	}
   
 }
