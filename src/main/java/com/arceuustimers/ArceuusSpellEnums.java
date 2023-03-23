@@ -3,6 +3,7 @@ package com.arceuustimers;
 public enum ArceuusSpellEnums
 {
 	SUMMON,
+	THRALL_COOLDOWN,
 	Ghost,
 	Skeleton,
 	Zombie,

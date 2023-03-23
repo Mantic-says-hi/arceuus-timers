@@ -21,14 +21,13 @@ public class ArceuusTimersInfobox extends InfoBox
 	InfoBoxManager manager;
 
 	public ArceuusTimersInfobox(BufferedImage image, ArceuusTimersPlugin plugin, double time,
-								InfoBoxManager manager, Instant start, ArceuusSpellEnums identifier, String tooltip)
+								InfoBoxManager manager, Instant start, String tooltip)
 	{
 		super(image, plugin);
 		this.plugin = plugin;
 		this.time = time;
 		this.manager = manager;
 		this.start = start;
-		this.identifier = identifier;
 		this.end = start.plusSeconds((long)time);
 		setTooltip(tooltip);
 		setImage(image);

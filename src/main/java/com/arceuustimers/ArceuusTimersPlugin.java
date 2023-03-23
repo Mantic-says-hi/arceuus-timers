@@ -22,7 +22,7 @@ import net.runelite.client.util.ImageUtil;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.HashMap;
-
+import java.util.Locale;
 
 
 @Slf4j
@@ -118,29 +118,17 @@ public class ArceuusTimersPlugin extends Plugin
 		}
 
 		//Summon Thrall | varbit = 12290 | 1 = Cooling down
-		//Active Thrall | varbit = 12413 | 0 = Summon ended
-		int summonCooldown = client.getVarbitValue(Varbits.RESURRECT_THRALL_COOLDOWN);
-		int thrallActive = client.getVarbitValue(Varbits.RESURRECT_THRALL);
-		if(thrallActive == 1 && !spellActive.get( ArceuusSpellEnums.SUMMON ))
+		int summonCooldownBit = client.getVarbitValue(Varbits.RESURRECT_THRALL_COOLDOWN);
+		if(summonCooldownBit == 1 && spellActive.get(ArceuusSpellEnums.THRALL_COOLDOWN))
 		{
-			double thrallUptime = 0.6 * client.getBoostedSkillLevel(Skill.MAGIC);
-			if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_GRANDMASTER ) == 2)
-			{
-				thrallUptime = ( thrallUptime * 2.0 );
-			}
-			else if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_MASTER ) == 2)
-			{
-				thrallUptime = ( thrallUptime * 1.5 );
-			}
-
-			onSpellCast( (thrallUptime), ArceuusSpellEnums.SUMMON, filename.get(thrallImage),
-					    "Active thrall ( " +thrallImage.toString()+" )");
-			spellActive.replace(ArceuusSpellEnums.SUMMON,true);
-
+			double summonCooldownTime = 11.0;
+			onSpellCast(summonCooldownTime, ArceuusSpellEnums.THRALL_COOLDOWN,
+					filename.get(ArceuusSpellEnums.THRALL_COOLDOWN), "Thrall cooldown");
+			spellActive.replace(ArceuusSpellEnums.THRALL_COOLDOWN, true);
 		}
-		else if(thrallActive == 0 && spellActive.get(ArceuusSpellEnums.SUMMON))
+		else if ( summonCooldownBit == 0 && spellActive.get(ArceuusSpellEnums.THRALL_COOLDOWN))
 		{
-			removeBox(ArceuusSpellEnums.SUMMON);
+			removeBox(ArceuusSpellEnums.THRALL_COOLDOWN);
 		}
 
 
@@ -156,6 +144,30 @@ public class ArceuusTimersPlugin extends Plugin
 		else if( vigourBit == 0 && spellActive.get(ArceuusSpellEnums.VIGOUR) )
 		{
 			removeBox(ArceuusSpellEnums.VIGOUR);
+		}
+
+		//Active Thrall | varbit = 12413 | 1 = Summon active
+		int thrallActive = client.getVarbitValue(Varbits.RESURRECT_THRALL);
+		if(thrallActive == 1 && !spellActive.get( ArceuusSpellEnums.SUMMON ))
+		{
+			double thrallUptime = 0.6 * client.getBoostedSkillLevel(Skill.MAGIC);
+			if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_GRANDMASTER ) == 2)
+			{
+				thrallUptime = ( thrallUptime * 2.0 );
+			}
+			else if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_MASTER ) == 2)
+			{
+				thrallUptime = ( thrallUptime * 1.5 );
+			}
+
+			onSpellCast( (thrallUptime), ArceuusSpellEnums.SUMMON, filename.get(thrallImage),
+					"Active thrall ( " +thrallImage.toString()+" )");
+			spellActive.replace(ArceuusSpellEnums.SUMMON,true);
+
+		}
+		else if(thrallActive == 0 && spellActive.get(ArceuusSpellEnums.SUMMON))
+		{
+			removeBox(ArceuusSpellEnums.SUMMON);
 		}
 
 
@@ -174,8 +186,6 @@ public class ArceuusTimersPlugin extends Plugin
 			removeBox(ArceuusSpellEnums.SHADOW);
 		}
 
-
-
 	}
 
 
@@ -183,7 +193,7 @@ public class ArceuusTimersPlugin extends Plugin
 	{
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), filename);
 		InfoBox box = new ArceuusTimersInfobox(icon, this, time, infoBoxManager,
-				                               Instant.now(), identifier, tooltip);
+				                               Instant.now(), tooltip);
 
 		infoBoxManager.addInfoBox(box);
 		activeInfoBox.replace(identifier, box);
@@ -202,7 +212,7 @@ public class ArceuusTimersPlugin extends Plugin
 
 
 		String option = cast.getMenuTarget();
-		log.info(option);
+
 		if(option.contains("Ghost")) {
 			thrallImage = ArceuusSpellEnums.Ghost;
 			return;
@@ -236,11 +246,13 @@ public class ArceuusTimersPlugin extends Plugin
 	private void setupHashMaps()
 	{
 		spellActive.put(ArceuusSpellEnums.SUMMON,false);
+		spellActive.put(ArceuusSpellEnums.THRALL_COOLDOWN,false);
 		spellActive.put(ArceuusSpellEnums.CHARGE,false);
 		spellActive.put(ArceuusSpellEnums.SHADOW,false);
 		spellActive.put(ArceuusSpellEnums.VIGOUR,false);
 		spellActive.put(ArceuusSpellEnums.CORRUPTION,false);
 		activeInfoBox.put(ArceuusSpellEnums.SUMMON,null);
+		activeInfoBox.put(ArceuusSpellEnums.THRALL_COOLDOWN, null);
 		activeInfoBox.put(ArceuusSpellEnums.CHARGE,null);
 		activeInfoBox.put(ArceuusSpellEnums.SHADOW,null);
 		activeInfoBox.put(ArceuusSpellEnums.VIGOUR,null);
@@ -248,6 +260,7 @@ public class ArceuusTimersPlugin extends Plugin
 		filename.put(ArceuusSpellEnums.Ghost,"/ghost.png");
 		filename.put(ArceuusSpellEnums.Skeleton,"/skeleton.png");
 		filename.put(ArceuusSpellEnums.Zombie,"/zombie.png");
+		filename.put(ArceuusSpellEnums.THRALL_COOLDOWN,"/thrall_cooldown.png");
 		filename.put(ArceuusSpellEnums.CHARGE,"/death_charge.png");
 		filename.put(ArceuusSpellEnums.SHADOW,"/shadow_veil.png");
 		filename.put(ArceuusSpellEnums.VIGOUR,"/vile_vigour.png");
