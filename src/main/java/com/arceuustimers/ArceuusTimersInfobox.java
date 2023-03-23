@@ -12,10 +12,8 @@ import java.time.Instant;
 
 public class ArceuusTimersInfobox extends InfoBox
 {
-	private final ArceuusTimersPlugin plugin;
-	private double time;
-	private Instant start;
-	private Instant end;
+	private final double time;
+	private final Instant end;
 	private long left;
 	InfoBoxManager manager;
 
@@ -23,10 +21,8 @@ public class ArceuusTimersInfobox extends InfoBox
 								InfoBoxManager manager, Instant start, String tooltip)
 	{
 		super(image, plugin);
-		this.plugin = plugin;
 		this.time = time;
 		this.manager = manager;
-		this.start = start;
 		this.end = start.plusSeconds((long)time);
 		setTooltip(tooltip);
 		setImage(image);
