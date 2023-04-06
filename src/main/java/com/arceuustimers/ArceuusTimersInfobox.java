@@ -5,6 +5,7 @@ import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxPriority;
 
+import javax.inject.Inject;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
@@ -16,6 +17,7 @@ public class ArceuusTimersInfobox extends InfoBox
 	private final Instant end;
 	private long left;
 	InfoBoxManager manager;
+	ArceuusTimersConfig config;
 
 	public ArceuusTimersInfobox(BufferedImage image, ArceuusTimersPlugin plugin, double time,
 								InfoBoxManager manager, Instant start, String tooltip)
@@ -23,11 +25,11 @@ public class ArceuusTimersInfobox extends InfoBox
 		super(image, plugin);
 		this.time = time;
 		this.manager = manager;
+		this.config = plugin.getConfig();
 		this.end = start.plusSeconds((long)time);
 		setTooltip(tooltip);
 		setImage(image);
 		setPriority(InfoBoxPriority.HIGH);
-
 	}
 
 	public String getText()
@@ -47,10 +49,10 @@ public class ArceuusTimersInfobox extends InfoBox
 	{
 		if((double)left <= time*0.17)
 		{
-			return Color.ORANGE;
+			return config.lowTimeTextColour();
 		}
 
-		return Color.PINK.brighter();
+		return config.textColour();
 	}
 
 	public boolean render()

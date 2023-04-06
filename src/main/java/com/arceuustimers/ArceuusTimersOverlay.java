@@ -15,18 +15,12 @@ import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 
 public class ArceuusTimersOverlay extends OverlayPanel
 {
-	private final Client client;
-	private final ArceuusTimersPlugin plugin;
-
 	@Inject
-	private ArceuusTimersOverlay(Client client, ArceuusTimersPlugin plugin)
+	private ArceuusTimersOverlay(ArceuusTimersPlugin plugin)
 	{
 		super(plugin);
-		this.client = client;
-		this.plugin = plugin;
 		setPosition(OverlayPosition.BOTTOM_LEFT);
-		setPriority(OverlayPriority.MED);
+		setPriority(OverlayPriority.LOW);
 		getMenuEntries().add(new OverlayMenuEntry(RUNELITE_OVERLAY_CONFIG, OPTION_CONFIGURE, "Arceuus Overlay "));
 	}
-  
 }
