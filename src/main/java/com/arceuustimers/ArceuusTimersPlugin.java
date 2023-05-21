@@ -4,7 +4,6 @@ import com.arceuustimers.controllers.*;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 
-
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -160,15 +159,15 @@ public class ArceuusTimersPlugin extends Plugin
 		put("You do not have enough Blood Runes to cast this spell.", () -> gameMessageIconLockRelease());
 		put("You don't have enough Prayer points to cast that spell.", () -> gameMessageIconLockRelease());
 		put("You can only cast corruption spells every 30 seconds.", () -> gameMessageCorrLockRelease());
-		put("<col=ef0083>You resurrect a lesser ghostly  thrall.</col>", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
-		put("<col=ef0083>You resurrect a lesser skeletal thrall.</col>", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
-		put("<col=ef0083>You resurrect a lesser zombified thrall.</col>", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
-		put("<col=ef0083>You resurrect a superior ghostly thrall.</col>", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
-		put("<col=ef0083>You resurrect a superior skeletal thrall.</col>", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
-		put("<col=ef0083>You resurrect a superior zombified thrall.</col>", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
-		put("<col=ef0083>You resurrect a greater ghostly thrall.</col>", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
-		put("<col=ef0083>You resurrect a greater skeletal thrall.</col>", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
-		put("<col=ef0083>You resurrect a greater zombified thrall.</col>", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
+		put("You resurrect a lesser ghostly  thrall.", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
+		put("You resurrect a lesser skeletal thrall.", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
+		put("You resurrect a lesser zombified thrall.", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
+		put("You resurrect a superior ghostly thrall.", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
+		put("You resurrect a superior skeletal thrall.", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
+		put("You resurrect a superior zombified thrall.", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
+		put("You resurrect a greater ghostly thrall.", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
+		put("You resurrect a greater skeletal thrall.", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
+		put("You resurrect a greater zombified thrall.", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
 	}};
 
 	//Unlock thrall icon
@@ -187,9 +186,9 @@ public class ArceuusTimersPlugin extends Plugin
 	@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
-		final String message = event.getMessage();
-
-		//Unlocks corruption or thrall icons that are locked on accident
+		String message = event.getMessage();
+		message = message.replaceAll("<col=[a-z0-9]+>", "").replaceAll("</col>", "");
+		//Unlocks corruption or thrall icons that are locked as a result of spam clicking
 		if(event.getType().equals(ChatMessageType.GAMEMESSAGE)) {
 			Runnable handler = gameMessageIconLockHandlers.get(message);
 			if (handler != null) {
@@ -197,7 +196,8 @@ public class ArceuusTimersPlugin extends Plugin
 			}
 		}
 
-		if(message.equals("<col=6800bf>Your thieving abilities have been enhanced.</col>")) {
+		//Important to be able to reset the timer when recasting before time has expired
+		if(message.equals("Your thieving abilities have been enhanced.")) {
 			ShadowVeilController spell = (ShadowVeilController) data.get(ArceuusSpell.SHADOW);
 			spell.chatMessageResponse();
 		}

@@ -29,7 +29,7 @@ public class ArceuusTimersInfobox extends InfoBox
 		this.end = start.plusSeconds((long)time);
 		setTooltip(tooltip);
 		setImage(image);
-		setPriority(InfoBoxPriority.HIGH);
+		setPriority(config.arceuusBoxPriority());
 	}
 
 	public String getText()
