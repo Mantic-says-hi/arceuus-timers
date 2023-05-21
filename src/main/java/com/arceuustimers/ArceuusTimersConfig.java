@@ -4,6 +4,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.ui.overlay.infobox.InfoBoxPriority;
 
 import java.awt.*;
 
@@ -139,5 +140,14 @@ public interface ArceuusTimersConfig extends Config
 			position = 14
 	)
 	default Color lowTimeTextColour() { return Color.ORANGE; }
+
+	String ARCEUUS_BOX_PRIORITY = "arceuusBoxPriority";
+	@ConfigItem(
+			keyName = ARCEUUS_BOX_PRIORITY,
+			name = "Infobox Priority",
+			description = "Change the priority of the infoboxes created by this plugin.",
+			position = 15
+	)
+	default InfoBoxPriority arceuusBoxPriority() { return InfoBoxPriority.NONE; }
 
 }
