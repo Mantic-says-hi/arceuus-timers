@@ -42,7 +42,14 @@ public class ArceuusTimersInfobox extends InfoBox
 			return "";
 		}
 
-		return "" + left;
+		if(config.formatOption()){
+			int minutes = (int) left / 60;
+			int seconds = (int) left % 60;
+			return String.format("%d:%02d", minutes, seconds);
+		}else {
+			return "" + left;
+		}
+
 	}
 
 	public Color getTextColor()
