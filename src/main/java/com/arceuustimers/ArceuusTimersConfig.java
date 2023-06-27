@@ -150,4 +150,12 @@ public interface ArceuusTimersConfig extends Config
 	)
 	default InfoBoxPriority arceuusBoxPriority() { return InfoBoxPriority.NONE; }
 
+	String FORMAT_OPTION = "formatOption";
+	@ConfigItem(
+			keyName = FORMAT_OPTION,
+			name = "RuneLite Text Format",
+			description = "Off for whole numbers, on for '0:00' format",
+			position = 16
+	)
+	default boolean formatOption() { return false; }
 }
