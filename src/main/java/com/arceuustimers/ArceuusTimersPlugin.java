@@ -5,12 +5,14 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.Varbits;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -23,13 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-/*
-* NEED TO FIX
-* 	ON DEATH/TELEPORT/INSTANCE Changes
-* 	THRALL ICON LOCK
-*
-*
-* */
 
 @Slf4j
 @PluginDescriptor(
@@ -262,17 +257,17 @@ public class ArceuusTimersPlugin extends Plugin
 
 
 	private final Map<String, Runnable> menuOptionHandlers = new HashMap<String, Runnable>() {{
-		put("<col=00ff00>Resurrect Lesser Ghost</col>", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
-		put("<col=00ff00>Resurrect Lesser Skeleton</col>", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
-		put("<col=00ff00>Resurrect Lesser Zombie</col>", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
-		put("<col=00ff00>Resurrect Superior Ghost</col>", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
-		put("<col=00ff00>Resurrect Superior Skeleton</col>", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
-		put("<col=00ff00>Resurrect Superior Zombie</col>", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
-		put("<col=00ff00>Resurrect Greater Ghost</col>", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
-		put("<col=00ff00>Resurrect Greater Skeleton</col>", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
-		put("<col=00ff00>Resurrect Greater Zombie</col>", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
-		put("<col=00ff00>Greater Corruption</col>", () -> modifyCorruptionData("/greater.png"));
-		put("<col=00ff00>Lesser Corruption</col>", () -> modifyCorruptionData("/lesser.png"));
+		put("Resurrect Lesser Ghost", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
+		put("Resurrect Lesser Skeleton", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
+		put("Resurrect Lesser Zombie", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
+		put("Resurrect Superior Ghost", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
+		put("Resurrect Superior Skeleton", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
+		put("Resurrect Superior Zombie", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
+		put("Resurrect Greater Ghost", () -> modifyThrallData("/ghost.png", "Active thrall ( Ghost )"));
+		put("Resurrect Greater Skeleton", () -> modifyThrallData("/skeleton.png", "Active thrall ( Skeleton )"));
+		put("Resurrect Greater Zombie", () -> modifyThrallData("/zombie.png", "Active thrall ( Zombie )"));
+		put("Greater Corruption", () -> modifyCorruptionData("/greater.png"));
+		put("Lesser Corruption", () -> modifyCorruptionData("/lesser.png"));
 	}};
 
 	private void modifyThrallData(String fileName, String tooltip) {
@@ -297,6 +292,10 @@ public class ArceuusTimersPlugin extends Plugin
 
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked cast) {
+		String option = cast.
+				getMenuTarget().
+				replaceAll("<col=[a-z0-9]+>", "").
+				replaceAll("</col>", "");
 		Runnable handler = menuOptionHandlers.get(cast.getMenuTarget());
 		if (handler != null) {
 			handler.run();
