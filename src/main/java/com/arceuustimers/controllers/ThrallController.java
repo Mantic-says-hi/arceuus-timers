@@ -36,7 +36,7 @@ public class ThrallController extends SpellController
 			{
 				thrallUptime = ( thrallUptime * 1.5 );
 			}
-			super.setCooldown(thrallUptime);
+			super.setCooldown(thrallUptime - 0.6);
 			createBox();
 
 		}
@@ -45,6 +45,7 @@ public class ThrallController extends SpellController
 			removeBox();
 		}
 	}
+
 
 	public boolean isIconLocked() {
 		return iconLock;

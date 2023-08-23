@@ -14,51 +14,53 @@ import java.time.Instant;
 public class ArceuusTimersInfobox extends InfoBox
 {
 	private final double time;
-	private final Instant end;
-	private long left;
+	private double timeLeft;
 	InfoBoxManager manager;
 	ArceuusTimersConfig config;
 
 	public ArceuusTimersInfobox(BufferedImage image, ArceuusTimersPlugin plugin, double time,
-								InfoBoxManager manager, Instant start, String tooltip)
+								InfoBoxManager manager, String tooltip)
 	{
 		super(image, plugin);
 		this.time = time;
 		this.manager = manager;
 		this.config = plugin.getConfig();
-		this.end = start.plusSeconds((long)time);
+		timeLeft = time;
 		setTooltip(tooltip);
 		setImage(image);
 		setPriority(config.arceuusBoxPriority());
 	}
 
+	public void decreaseByGameTick()
+	{
+		timeLeft -= 0.6;
+	}
+
 	public String getText()
 	{
-		Duration timeLeft = Duration.between(Instant.now(), end);
-		left = timeLeft.toMillis()/1000;
-
-		if(left < 0)
+		if(timeLeft < 0)
 		{
 			return "";
 		}
 
-		if(config.formatOption()){
-			int minutes = (int) left / 60;
-			int seconds = (int) left % 60;
-			return String.format("%d:%02d", minutes, seconds);
-		}else {
-			return "" + left;
+		switch (config.textFormat()) {
+			case MINUTES:
+				int minutes = (int)(timeLeft / 60);
+				int seconds = (int)(timeLeft % 60);
+				return String.format("%d:%02d", minutes, seconds);
+			case GAME_TICKS:
+				return "" + (int)(timeLeft / 0.6);
+			case SECONDS:
+			default:
+				return "" + (int)(timeLeft);
 		}
-
 	}
 
 	public Color getTextColor()
 	{
-		if((double)left <= time*0.17)
-		{
+		if(timeLeft <= time*0.17) {
 			return config.lowTimeTextColour();
 		}
-
 		return config.textColour();
 	}
 
