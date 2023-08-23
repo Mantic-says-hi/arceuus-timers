@@ -5,11 +5,11 @@ import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
-public class ShadowVeilController extends SpellController
+public class WardController extends SpellController
 {
 	private final Client client;
 
-	public ShadowVeilController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin, Client client)
+	public WardController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin, Client client)
 	{
 		super(fileName,cooldown,tooltip,manager,plugin);
 		this.client = client;
@@ -18,17 +18,14 @@ public class ShadowVeilController extends SpellController
 	@Override
 	public void varbitChange(int bit)
 	{
-		if(super.getActive())
-		{
-			removeBox();
-		}
-		if (bit == 1)
-		{
+			if(super.getActive())
+			{
+				removeBox();
+			}
+
 			double wardTime = (0.6 * client.getRealSkillLevel(Skill.MAGIC)) + 1.2; //Add extra 2 ticks
 			super.setCooldown(wardTime);
 			createBox();
-		}
-
 	}
 
 	@Override
@@ -43,7 +40,7 @@ public class ShadowVeilController extends SpellController
 		super.removeBox();
 	}
 
-	public void veilFadedResponse()
+	public void wardExpiredResponse()
 	{
 		if(super.getActive())
 		{

@@ -2,17 +2,16 @@ package com.arceuustimers.controllers;
 
 import com.arceuustimers.ArceuusTimersInfobox;
 import com.arceuustimers.ArceuusTimersPlugin;
-import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.util.ImageUtil;
 
 import java.awt.image.BufferedImage;
-import java.time.Instant;
+
 
 public abstract class SpellController
 {
 	private boolean active;
-	private InfoBox box;
+	private ArceuusTimersInfobox box;
 	private String fileName;
 	private double cooldown;
 	private String tooltip;
@@ -66,6 +65,11 @@ public abstract class SpellController
 		}
 	}
 
+	public void updateTime()
+	{
+		this.box.decreaseByGameTick();
+	}
+
 	protected void createBox()
 	{
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), fileName);
@@ -74,7 +78,6 @@ public abstract class SpellController
 				this.plugin,
 				this.cooldown,
 				this.manager,
-				Instant.now(),
 				this.tooltip);
 		this.manager.addInfoBox(this.box);
 		this.active = true;
