@@ -88,7 +88,7 @@ public class ArceuusTimersPlugin extends Plugin
 	}
 
 	@Override
-	protected void startUp()
+	protected void startUp() throws Exception
 	{
 		overlayManager.add( overlay );
 		createSpellControllers();
@@ -98,7 +98,7 @@ public class ArceuusTimersPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown()
+	protected void shutDown() throws Exception
 	{
 		overlayManager.remove( overlay );
 		//Only remove the active InfoBoxes that are created by this plugin
