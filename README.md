@@ -3,7 +3,7 @@ An alternate implementation for Acreuus spellbook timers.
 
 This plugin serves as a minor visual upgrade for Arceuus spells over the implementation in the RuneLite 'Timers' plugin.
 
-![allIcons](https://imgur.com/0e2PJyO.png)
+![allIcons](https://imgur.com/u3dCLG0.png)
 ## What is this plugin?
  - The RuneLite 'Timers' plugin shows the same icon regardless of the spell cast, this plugin changes that with\
    unique icons  based on the spell that is cast

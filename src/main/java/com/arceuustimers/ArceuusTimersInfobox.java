@@ -3,13 +3,10 @@ package com.arceuustimers;
 
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import net.runelite.client.ui.overlay.infobox.InfoBoxPriority;
 
-import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.time.Duration;
-import java.time.Instant;
+
 
 public class ArceuusTimersInfobox extends InfoBox
 {
@@ -17,6 +14,8 @@ public class ArceuusTimersInfobox extends InfoBox
 	private double timeLeft;
 	InfoBoxManager manager;
 	ArceuusTimersConfig config;
+	private static final double GAME_TICK = 0.6;
+	private static final double LOW_TIME = 0.175;
 
 	public ArceuusTimersInfobox(BufferedImage image, ArceuusTimersPlugin plugin, double time,
 								InfoBoxManager manager, String tooltip)
@@ -33,7 +32,7 @@ public class ArceuusTimersInfobox extends InfoBox
 
 	public void decreaseByGameTick()
 	{
-		timeLeft -= 0.6;
+		timeLeft -= GAME_TICK;
 	}
 
 	public String getText()
@@ -49,7 +48,7 @@ public class ArceuusTimersInfobox extends InfoBox
 				int seconds = (int)(timeLeft % 60);
 				return String.format("%d:%02d", minutes, seconds);
 			case GAME_TICKS:
-				return "" + (int)(timeLeft / 0.6);
+				return "" + (int)(timeLeft / GAME_TICK);
 			case SECONDS:
 			default:
 				return "" + (int)(timeLeft);
@@ -58,7 +57,8 @@ public class ArceuusTimersInfobox extends InfoBox
 
 	public Color getTextColor()
 	{
-		if(timeLeft <= time*0.17) {
+
+		if(timeLeft <= time * LOW_TIME) {
 			return config.lowTimeTextColour();
 		}
 		return config.textColour();

@@ -13,6 +13,13 @@ public class ThrallController extends SpellController
 
 	private final Client client;
 	private boolean iconLock;
+	private static final double GAME_TICK = 0.6;
+	private static final int VARBIT_DOWN = 0;
+	private static final int VARBIT_MANUAL= -1;
+	private static final int VARBIT_UP = 1;
+	private static final int UNLOCKED = 2;
+	private static final double GM_MULTIPLIER = 2.0;
+	private static final double M_MULTIPLIER = 1.5;
 
 	public ThrallController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin, Client client)
 	{
@@ -25,22 +32,24 @@ public class ThrallController extends SpellController
 	public void varbitChange(int bit)
 	{
 		setIconLock(false);
-		if(bit == 1 && !super.getActive())
+		if((bit == VARBIT_UP || bit == VARBIT_MANUAL) && !super.getActive())
 		{
-			double thrallUptime = 0.6 * client.getBoostedSkillLevel(Skill.MAGIC);
-			if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_GRANDMASTER ) == 2)
+			double thrallUptime = GAME_TICK * client.getBoostedSkillLevel(Skill.MAGIC);
+			if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_GRANDMASTER ) == UNLOCKED)
 			{
-				thrallUptime = ( thrallUptime * 2.0 );
+				thrallUptime = ( thrallUptime * GM_MULTIPLIER );
 			}
-			else if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_MASTER ) == 2)
+			else if( client.getVarbitValue( Varbits.COMBAT_ACHIEVEMENT_TIER_MASTER ) == UNLOCKED)
 			{
-				thrallUptime = ( thrallUptime * 1.5 );
+				thrallUptime = ( thrallUptime * M_MULTIPLIER );
 			}
-			super.setCooldown(thrallUptime - 0.6);
+			thrallUptime -= GAME_TICK;//Accounts for 1 tick delay when setting box
+			if(bit == VARBIT_MANUAL){thrallUptime += ( 5 * GAME_TICK);}//Accounts for 5 tick delay in special cases
+			super.setCooldown(thrallUptime);
 			createBox();
 
 		}
-		else if(bit == 0 && super.getActive())
+		else if(bit == VARBIT_DOWN && super.getActive())
 		{
 			removeBox();
 		}
