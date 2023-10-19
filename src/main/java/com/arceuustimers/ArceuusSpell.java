@@ -13,5 +13,6 @@ public enum ArceuusSpell
 	VIGOUR,
 	CORRUPTION,
 	OFFERING,
-	LURE
+	LURE,
+	MARK
 }

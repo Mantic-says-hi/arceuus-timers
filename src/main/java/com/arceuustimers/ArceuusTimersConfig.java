@@ -144,6 +144,16 @@ public interface ArceuusTimersConfig extends Config
 	)
 	default boolean showDarkLureCooldown() { return true; }
 
+	String SHOW_MARK_OF_DARKNESS = "showMarkTimer";
+	@ConfigItem(
+			section = SECTION_OTHER,
+			keyName = SHOW_MARK_OF_DARKNESS,
+			name = "Show Mark of Darkness Timer",
+			description = "Infobox with timer for Mark of Darkness spell.",
+			position = 14
+	)
+	default boolean showMarkTimer() { return true; }
+
 	String SHOW_OFFERINGS_COOLDOWN = "showOfferingsCooldown";
 	@ConfigItem(
 			section = SECTION_OTHER,

@@ -1,8 +1,5 @@
 package com.arceuustimers;
 
-
-import net.runelite.api.Client;
-import net.runelite.api.MenuAction;
 import net.runelite.client.ui.overlay.OverlayMenuEntry;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;

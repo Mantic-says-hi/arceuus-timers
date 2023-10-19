@@ -17,6 +17,8 @@ public abstract class SpellController
 	private String tooltip;
 	private final InfoBoxManager manager;
 	private final ArceuusTimersPlugin plugin;
+	private static final int VARBIT_UP = 1;
+	private static final int VARBIT_DOWN = 0;
 
 
 
@@ -49,10 +51,10 @@ public abstract class SpellController
 
 	public void varbitChange(int bit)
 	{
-		if( bit == 1 && !this.active ) {
+		if( bit == VARBIT_UP && !this.active ) {
 			createBox();
 		}
-		else if( bit == 0 && this.active) {
+		else if( bit == VARBIT_DOWN && this.active) {
 			removeBox();
 		}
 	}
