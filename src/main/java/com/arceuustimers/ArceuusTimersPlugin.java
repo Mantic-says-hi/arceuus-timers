@@ -48,6 +48,7 @@ public class ArceuusTimersPlugin extends Plugin
 	private static final String TIMERS_PLUGIN = "timers";
 	private static final String SHOW_ARCEUUS = "showArceuus";
 	private static final String SHOW_ARCEUUS_COOLDOWN = "showArceuusCooldown";
+	private static final String SHOW_SPELLBOOK_SWAP = "showSpellbookSwap";
 	private static final int VILE_VIGOUR = 12292;
 	private static final int OFFERINGS = 12423;
 	private static final int DARK_LURE =  12289;
@@ -61,6 +62,7 @@ public class ArceuusTimersPlugin extends Plugin
 	private static final double CD_MED = 31.2;
 	private static final double CD_SHORT = 10.8;
 	private static final double CD_TINY = 6.0;
+	private static final double SBS_TIME = 120;
 
 	private int thrallTest = 0;
 	@Inject
@@ -111,6 +113,7 @@ public class ArceuusTimersPlugin extends Plugin
 	{
 		configManager.setConfiguration(TIMERS_PLUGIN, SHOW_ARCEUUS, state);
 		configManager.setConfiguration(TIMERS_PLUGIN, SHOW_ARCEUUS_COOLDOWN, state);
+		configManager.setConfiguration(TIMERS_PLUGIN, SHOW_SPELLBOOK_SWAP, state);
 	}
 
 	private void removeActiveInfoboxes()
@@ -436,6 +439,7 @@ public class ArceuusTimersPlugin extends Plugin
 			case VILE_VIGOUR: return ArceuusSpell.VIGOUR;
 			case DARK_LURE: return ArceuusSpell.LURE;
 			case OFFERINGS: return ArceuusSpell.OFFERING;
+			case Varbits.SPELLBOOK_SWAP: return  ArceuusSpell.SPELLBOOK_SWAP;
 
 			default: return null;
 		}
@@ -475,6 +479,9 @@ public class ArceuusTimersPlugin extends Plugin
 		}
 		if (config.showWardOfArceuusCooldown() || config.showWardOfArceuus()){
 			spellVarbits.add(Varbits.WARD_OF_ARCEUUS_COOLDOWN);
+		}
+		if (config.spellbookSwapToggle()){
+			spellVarbits.add(Varbits.SPELLBOOK_SWAP);
 		}
 	}
 
@@ -579,6 +586,8 @@ public class ArceuusTimersPlugin extends Plugin
 				new InitialSpellData("/sinister_offering.png", CD_TINY, "Sinister Offering cooldown"));
 		initData.put(ArceuusSpell.MARK,
 				new InitialSpellData("/mark.png", NO_TEXT, "Mark of Darkness active"));
+		initData.put(ArceuusSpell.SPELLBOOK_SWAP,
+				new InitialSpellData("/sbs.png", SBS_TIME, ""));
 
 		for(ArceuusSpell spell: ArceuusSpell.values())
 		{

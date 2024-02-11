@@ -209,4 +209,14 @@ public interface ArceuusTimersConfig extends Config
 			position = 19
 	)
 	default TextFormat textFormat() { return TextFormat.SECONDS; }
+
+	String SPELLBOOK_SWAP = "spellbookSwap";
+	@ConfigItem(
+			keyName = SPELLBOOK_SWAP,
+			name = "Spellbook Swap Timer",
+			description = "Show time left to cast a spell from the Lunar spell, Spellbook Swap.",
+			position = 20
+	)
+	default boolean spellbookSwapToggle() { return true; }
+
 }

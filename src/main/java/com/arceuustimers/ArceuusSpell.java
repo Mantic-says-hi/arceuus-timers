@@ -14,5 +14,6 @@ public enum ArceuusSpell
 	CORRUPTION,
 	OFFERING,
 	LURE,
-	MARK
+	MARK,
+	SPELLBOOK_SWAP
 }

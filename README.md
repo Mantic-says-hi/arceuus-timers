@@ -3,12 +3,16 @@ An alternate implementation for Acreuus spellbook timers.
 
 This plugin serves as a minor visual upgrade for Arceuus spells over the implementation in the RuneLite 'Timers' plugin.
 
-![allIcons](https://imgur.com/u3dCLG0.png)
+![allIcons](https://imgur.com/kG2g3bS.png)
 ## What is this plugin?
  - The RuneLite 'Timers' plugin shows the same icon regardless of the spell cast, this plugin changes that with\
    unique icons  based on the spell that is cast
     - This is the same spell icon for the 'Resurrect Superior Skeleton' 
 
+   ### Latest Update
+     - Spellbook Swap timer
+        - Shows the time left to cast a spell before going back to the Lunar spellbook
+     
    ### Unique thrall icons for Infoboxes
     - Custom icons for all thrall attack styles and subtypes
     - Custom icon  for thrall re-cast cooldown
@@ -46,7 +50,7 @@ This plugin serves as a minor visual upgrade for Arceuus spells over the impleme
    - Custom text colour pickers
    - Infobox's priority ( how high or low they appear on the infobox stack )
    - Whole number ( default ), or the standard RuneLite infobox text formatting 
-   - (NEW) Choose to countdown by game ticks
+   - Choose to countdown by game ticks
    
 ![format](https://imgur.com/Lrih4lv.png)
 
