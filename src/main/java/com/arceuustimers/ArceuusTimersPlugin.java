@@ -1,6 +1,7 @@
 package com.arceuustimers;
 
 import com.arceuustimers.controllers.CorruptionController;
+import com.arceuustimers.controllers.MarkController;
 import com.arceuustimers.controllers.SpellController;
 import com.arceuustimers.controllers.StandardController;
 import com.arceuustimers.controllers.ThrallController;
@@ -64,7 +65,7 @@ public class ArceuusTimersPlugin extends Plugin
 	private static final double CD_TINY = 6.0;
 	private static final double SBS_TIME = 120;
 
-	private int thrallTest = 0;
+
 	@Inject
 	private Client client;
 
@@ -134,10 +135,6 @@ public class ArceuusTimersPlugin extends Plugin
 				spellController.updateTime();
 			}
 		}
-
-		if(client.getVarbitValue(Varbits.RESURRECT_THRALL) == 1){
-			thrallTest++;
-		}
 	}
 
 	@Subscribe
@@ -171,7 +168,7 @@ public class ArceuusTimersPlugin extends Plugin
 					updateConfigChange(config.showShadowVeilCooldown(), Varbits.SHADOW_VEIL_COOLDOWN, ArceuusSpell.SHADOW_COOLDOWN);
 				}else if((!config.showShadowVeilCooldown() && config.showShadowVeil()))
 				{
-					//Need to force a true here for the cooldown incase it is not on, otherwise shadow veil
+					//Need to force a true here for the cooldown in case it is not on, otherwise shadow veil
 					//won't function properly if it is recast after a cooldown while it is still active
 					updateConfigChange(true, Varbits.SHADOW_VEIL_COOLDOWN, ArceuusSpell.SHADOW_COOLDOWN);
 					updateConfigChange(config.showShadowVeil(), Varbits.SHADOW_VEIL, ArceuusSpell.SHADOW);
@@ -334,12 +331,19 @@ public class ArceuusTimersPlugin extends Plugin
 		corruption.setIconLock(false);
 	}
 	private void gameMessageMarkOfDarkness() {
-		VariableTimerController mark = (VariableTimerController) data.get(ArceuusSpell.MARK);
+		MarkController mark = (MarkController) data.get(ArceuusSpell.MARK);
 		mark.nonVarbitChange();
 	}
+
 	private void expiredGameMessage(ArceuusSpell spell)
 	{
 		VariableTimerController responder = (VariableTimerController) data.get(spell);
+		responder.chatExpiredResponse();
+	}
+
+	private void expiredMarkMessage()
+	{
+		MarkController responder = (MarkController) data.get(ArceuusSpell.MARK);
 		responder.chatExpiredResponse();
 	}
 
@@ -525,7 +529,7 @@ public class ArceuusTimersPlugin extends Plugin
 		put("You have placed a Mark of Darkness upon yourself.",
 				() ->  gameMessageMarkOfDarkness());
 		put("Your Mark of Darkness has faded away.",
-				() ->  expiredGameMessage(ArceuusSpell.MARK));
+				() ->  expiredMarkMessage());
 	}};
 
 	private final Map<String, Runnable> menuOptionHandlers = new HashMap<String, Runnable>() {{
@@ -602,8 +606,16 @@ public class ArceuusTimersPlugin extends Plugin
 							this,
 							client);
 					break;
-				case WARD:
 				case MARK:
+					controller = new MarkController(
+							initData.get( spell ).getFile(),
+							initData.get( spell ).getCooldown(),
+							initData.get( spell ).getTooltip(),
+							infoBoxManager,
+							this,
+							client);
+					break;
+				case WARD:
 				case SHADOW:
 					controller = new VariableTimerController(
 							initData.get( spell ).getFile(),
