@@ -10,17 +10,16 @@ import java.awt.image.BufferedImage;
 
 public abstract class SpellController
 {
-	private boolean active;
-	private ArceuusTimersInfobox box;
-	private String fileName;
-	private double cooldown;
-	private String tooltip;
-	private final InfoBoxManager manager;
-	private final ArceuusTimersPlugin plugin;
-	private static final int VARBIT_UP = 1;
-	private static final int VARBIT_DOWN = 0;
-
-
+	protected boolean active;
+	protected ArceuusTimersInfobox box;
+	protected String fileName;
+	protected double cooldown;
+	protected String tooltip;
+	protected final InfoBoxManager manager;
+	protected final ArceuusTimersPlugin plugin;
+	protected static final int VARBIT_UP = 1;
+	protected static final int VARBIT_DOWN = 0;
+	private boolean showText = true;
 
 	public SpellController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin) {
 		this.fileName = fileName;
@@ -69,7 +68,9 @@ public abstract class SpellController
 
 	public void updateTime()
 	{
-		this.box.decreaseByGameTick();
+		if (!active || box == null) return;
+		box.decreaseByGameTick();
+		if (box.cull()) removeBox();
 	}
 
 	protected void createBox()
@@ -80,15 +81,18 @@ public abstract class SpellController
 				this.plugin,
 				this.cooldown,
 				this.manager,
-				this.tooltip);
+				this.tooltip,
+				showText);
 		this.manager.addInfoBox(this.box);
 		this.active = true;
 	}
 
-	protected void removeBox()
-	{
-		this.manager.removeInfoBox(this.box);
-		this.active = false;
-		this.box = null;
+	protected void removeBox() {
+		if (box != null)
+		{
+			manager.removeInfoBox(box);
+			box = null;
+		}
+		active = false;
 	}
 }
