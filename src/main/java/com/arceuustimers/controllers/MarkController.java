@@ -68,9 +68,6 @@ public class MarkController extends SpellController
 
 	public void chatExpiredResponse()
 	{
-		if(super.getActive())
-		{
-			removeBox();
-		}
+		if(super.getActive())removeBox();
 	}
 }
