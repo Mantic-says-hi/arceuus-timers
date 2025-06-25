@@ -45,13 +45,11 @@ public class ArceuusTimersPlugin extends Plugin
 	private final HashMap<ArceuusSpell, SpellController> data = new HashMap<>();
 	private final HashSet<Integer> spellVarbits = new HashSet<>();
 
-	private static final String TIMERS_PLUGIN = "timers";
-	private static final String SHOW_ARCEUUS = "showArceuus";
-	private static final String SHOW_ARCEUUS_COOLDOWN = "showArceuusCooldown";
-	private static final String SHOW_SPELLBOOK_SWAP = "showSpellbookSwap";
+	//private static final String TIMERS_PLUGIN = "timers";
+	//private static final String SHOW_ARCEUUS = "showArceuus";
+	//private static final String SHOW_ARCEUUS_COOLDOWN = "showArceuusCooldown";
+	//private static final String SHOW_SPELLBOOK_SWAP = "showSpellbookSwap";
     private static final int VARBIT_UP = 1;
-    private static final int VARBIT_DOWN = 0;
-	private static final int VARBIT_MANUAL= -1;
 	private static final double NO_TEXT = -1.0;
 	private static final double CD_LONG = 61.2;
 	private static final double CD_MED = 31.2;
@@ -121,7 +119,7 @@ public class ArceuusTimersPlugin extends Plugin
 		createSpellControllers();
 		initialSpellVarbits();
 		//Turn off 'Timers' plugin implementation
-		setTimersPlugin(false);
+		//setTimersPlugin(false);
 	}
 
 	@Override
@@ -131,15 +129,15 @@ public class ArceuusTimersPlugin extends Plugin
 		//Only remove the active InfoBoxes that are created by this plugin
 		removeActiveInfoboxes();
 		//Turn on 'Timers' plugin implementation to replace this one
-		setTimersPlugin(true);
+		//setTimersPlugin(true);
 	}
 
-	private void setTimersPlugin(boolean state)
+	/*private void setTimersPlugin(boolean state)
 	{
 		configManager.setConfiguration(TIMERS_PLUGIN, SHOW_ARCEUUS, state);
 		configManager.setConfiguration(TIMERS_PLUGIN, SHOW_ARCEUUS_COOLDOWN, state);
 		configManager.setConfiguration(TIMERS_PLUGIN, SHOW_SPELLBOOK_SWAP, state);
-	}
+	}*/
 
 	private void removeActiveInfoboxes()
 	{
