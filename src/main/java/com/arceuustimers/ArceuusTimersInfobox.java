@@ -25,6 +25,7 @@ public class ArceuusTimersInfobox extends InfoBox
 		this.showText = showText;
 		this.config = plugin.getConfig();
 		timeLeft = time;
+
 		setTooltip(tooltip);
 		setImage(image);
 		setPriority(config.arceuusBoxPriority());
