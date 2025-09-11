@@ -172,6 +172,9 @@ public class ArceuusTimersPlugin extends Plugin
 			case ArceuusTimersConfig.SHOW_DEATH_CHARGE_COOLDOWN:
 				updateConfigChange(config.showDeathChargeCooldown(),VarbitID.ARCEUUS_DEATH_CHARGE_COOLDOWN, ArceuusSpell.CHARGE_COOLDOWN);
 				break;
+            case ArceuusTimersConfig.STACK_DEATH_CHARGE:
+                updateDeathChargeBoxes();
+                break;
 			case ArceuusTimersConfig.SHOW_THRALL:
 				updateConfigChange(config.showThrall(), ArceuusSpell.THRALL);
 				break;
@@ -223,6 +226,8 @@ public class ArceuusTimersPlugin extends Plugin
 				break;
 			case ArceuusTimersConfig.SHOW_MARK_OF_DARKNESS:
 				updateConfigChange(config.showMarkTimer(), ArceuusSpell.MARK);
+            case ArceuusTimersConfig.SPELLBOOK_SWAP:
+                updateConfigChange(config.spellbookSwapToggle(), VarbitID.LUNAR_SPELLBOOK_CHANGE, ArceuusSpell.SPELLBOOK_SWAP);
 		}
 	}
 
@@ -240,6 +245,12 @@ public class ArceuusTimersPlugin extends Plugin
 	{
 		data.get(identifier).shutdown();
 	}
+
+    private void updateDeathChargeBoxes()
+    {
+        DeathChargeController deathChargeController = (DeathChargeController) data.get(ArceuusSpell.CHARGE);
+        deathChargeController.reCreate();
+    }
 
 	private void updateConfigChange(boolean enabled,ArceuusSpell identifier) { if(!enabled) { data.get(identifier).shutdown(); } }
 

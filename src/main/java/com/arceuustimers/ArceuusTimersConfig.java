@@ -48,10 +48,21 @@ public interface ArceuusTimersConfig extends Config
 	)
 	default boolean showDeathChargeCooldown() { return true; }
 
+    String STACK_DEATH_CHARGE = "stackDeathCharge";
+
+    @ConfigItem(
+            section = SECTION_DEATH_CHARGE,
+            keyName = STACK_DEATH_CHARGE,
+            name = "Stack Death Charge Boxes",
+            description = "Merges multiple Death Charge infoboxes into one when active.",
+            position = 4
+    )
+    default boolean stackDeathCharge() { return false; }
+
 	@ConfigSection(
 			name = "Resurrected Thralls",
 			description = "Thrall options.",
-			position = 4,
+			position = 5,
 			closedByDefault = true
 	)
 	String SECTION_THRALL = "thrall";
@@ -62,7 +73,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_THRALL,
 			name = "Show Thrall Timer",
 			description = "Infobox with timer for Resurrected Thralls.",
-			position = 5
+			position = 6
 	)
 	default boolean showThrall() { return true; }
 
@@ -72,14 +83,14 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_THRALL_COOLDOWN,
 			name = "Show Cooldown",
 			description = "Infobox with timer for Resurrect Thrall cooldown.",
-			position = 6
+			position = 7
 	)
 	default boolean showThrallCooldown() { return true; }
 
 	@ConfigSection(
 			name = "Other Spells",
 			description = "Options for the less popular Arceuus Spells",
-			position = 7,
+			position = 8,
 			closedByDefault = true
 	)
 	String SECTION_OTHER = "other";
@@ -90,7 +101,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_SHADOW_VEIL,
 			name = "Show Shadow Veil Timer",
 			description = "Infobox with timer for Shadow Veil spell.",
-			position = 8
+			position = 9
 	)
 	default boolean showShadowVeil() { return true; }
 
@@ -100,7 +111,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_SHADOW_VEIL_COOLDOWN,
 			name = "Show Shadow Veil Cooldown",
 			description = "Infobox with timer for Shadow Veil spell cooldown.",
-			position = 9
+			position = 10
 	)
 	default boolean showShadowVeilCooldown() { return true; }
 
@@ -110,7 +121,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_WARD_OF_ARCEUUS,
 			name = "Show Ward Of Arceuus Timer",
 			description = "Infobox with timer for Ward of Arceuus when active.",
-			position = 10
+			position = 11
 	)
 	default boolean showWardOfArceuus() { return true; }
 
@@ -120,7 +131,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_WARD_OF_ARCEUUS_COOLDOWN,
 			name = "Show Ward Of Arceuus Cooldown",
 			description = "Infobox with timer for Ward of Arceuus spell cooldown.",
-			position = 11
+			position = 12
 	)
 	default boolean showWardOfArceuusCooldown() { return true; }
 
@@ -130,7 +141,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_CORRUPTION_COOLDOWN,
 			name = "Show Corruption Cooldown",
 			description = "Infobox with timer for Lesser and Greater Corruption spells.",
-			position = 12
+			position = 13
 	)
 	default boolean showCorruptionCooldown() { return true; }
 
@@ -140,7 +151,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_DARK_LURE_COOLDOWN,
 			name = "Show Dark Lure Cooldown",
 			description = "Infobox with timer for Dark Lure spell.",
-			position = 13
+			position = 14
 	)
 	default boolean showDarkLureCooldown() { return true; }
 
@@ -150,7 +161,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_MARK_OF_DARKNESS,
 			name = "Show Mark of Darkness Timer",
 			description = "Infobox with timer for Mark of Darkness spell.",
-			position = 14
+			position = 15
 	)
 	default boolean showMarkTimer() { return true; }
 
@@ -160,7 +171,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_OFFERINGS_COOLDOWN,
 			name = "Show Offering Cooldown",
 			description = "Infobox with timer for Demonic and Sinister Offering spells.",
-			position = 14
+			position = 16
 	)
 	default boolean showOfferingsCooldown() { return true; }
 
@@ -170,7 +181,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SHOW_VILE_VIGOUR_COOLDOWN,
 			name = "Show Vile Vigour Cooldown",
 			description = "Infobox with timer for Vile Vigour spell.",
-			position = 15
+			position = 17
 	)
 	default boolean showVileVigourCooldown() { return true; }
 
@@ -179,7 +190,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = MAIN_TEXT_COLOUR,
 			name = "Text Colour",
 			description = "Change the text colour of the time remaining.",
-			position = 16
+			position = 18
 	)
 	default Color textColour() { return Color.PINK.brighter(); }
 
@@ -188,7 +199,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = LOW_TEXT_COLOUR,
 			name = "Low Time Colour",
 			description = "Change text colour when the time remaining is low",
-			position = 17
+			position = 19
 	)
 	default Color lowTimeTextColour() { return Color.ORANGE; }
 
@@ -197,7 +208,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = ARCEUUS_BOX_PRIORITY,
 			name = "Infobox Priority",
 			description = "Change the priority of the Infoboxes created by this plugin.",
-			position = 18
+			position = 20
 	)
 	default InfoBoxPriority arceuusBoxPriority() { return InfoBoxPriority.NONE; }
 
@@ -206,7 +217,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = TEXT_FORMAT,
 			name = "Text Format",
 			description = "Choose the format for displaying time: seconds, minutes, or game ticks",
-			position = 19
+			position = 21
 	)
 	default TextFormat textFormat() { return TextFormat.SECONDS; }
 
@@ -215,7 +226,7 @@ public interface ArceuusTimersConfig extends Config
 			keyName = SPELLBOOK_SWAP,
 			name = "Spellbook Swap Timer",
 			description = "Show time left to cast a spell from the Lunar spell, Spellbook Swap.",
-			position = 20
+			position = 22
 	)
 	default boolean spellbookSwapToggle() { return true; }
 

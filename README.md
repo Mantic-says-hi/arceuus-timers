@@ -10,12 +10,9 @@ This plugin serves as a minor visual upgrade for Arceuus spells over the impleme
     - This is the same spell icon for the 'Resurrect Superior Skeleton'
 
   ### Latest Update
-  ![Upgraded Death Charge](https://i.imgur.com/QmN9ENU.gif)
-    - Upgraded 'Death Charge' spell support
-      - Fixed issues when player has the upgrade
-    - Fixed issues where mark of darkness infoboxes would stay indefinitely
-    - Fixed issues where thrall infoboxes would be removed prematurely
-    - Fixed issues where thrall infoboxes would stay indefinitely 
+    - Fixed issues where mark of darkness infobox did not have the correct times after a Jagex update
+    - Fixed issue where spellbook swap infobox would show even if the configuration was turned off
+    - Added toggle option to combine active death charge infoboxes into one
 
 ![allIcons](https://imgur.com/kG2g3bS.png)
 ### Unique thrall icons for Infoboxes

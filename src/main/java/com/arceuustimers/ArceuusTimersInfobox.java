@@ -13,6 +13,7 @@ public class ArceuusTimersInfobox extends InfoBox
 	private final boolean showText;
 	InfoBoxManager manager;
 	ArceuusTimersConfig config;
+    private String text = "";
 	private static final double GAME_TICK = 0.6;
 	private static final double LOW_TIME = 0.175;
 
@@ -24,21 +25,43 @@ public class ArceuusTimersInfobox extends InfoBox
 		this.manager = manager;
 		this.showText = showText;
 		this.config = plugin.getConfig();
-		timeLeft = time;
+		this.timeLeft = time;
 
 		setTooltip(tooltip);
 		setImage(image);
 		setPriority(config.arceuusBoxPriority());
 	}
 
+
+    public ArceuusTimersInfobox(BufferedImage image, ArceuusTimersPlugin plugin, double time,
+                                InfoBoxManager manager, String tooltip, boolean showText, String text)
+    {
+        super(image, plugin);
+        this.time = time;
+        this.text = text;
+        this.manager = manager;
+        this.showText = showText;
+        this.config = plugin.getConfig();
+        this.timeLeft = time;
+        setTooltip(tooltip);
+        setImage(image);
+        setPriority(config.arceuusBoxPriority());
+    }
+
 	public void decreaseByGameTick()
 	{
 		timeLeft -= GAME_TICK;
 	}
 
+    public void changeText(String text)
+    {
+        this.text = text;
+    }
+
 	public String getText()
 	{
 		if (!showText || timeLeft < 0) return "";
+        if (!text.isEmpty()) return text;
 		switch (config.textFormat()) {
 			case MINUTES:
 				int minutes = (int)(timeLeft / 60);
