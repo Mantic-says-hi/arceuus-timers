@@ -58,9 +58,9 @@ public class ArceuusTimersPlugin extends Plugin
 	private static final double SBS_TIME = 120;
 
 	private static final ThrallType[] THRALL_TYPES = {
-			new ThrallType("/ghost.png", "Active thrall ( Ghost )"),       // VV 0, 3, 6
-			new ThrallType("/skeleton.png", "Active thrall ( Skeleton )"), // VV 1, 4, 7
-			new ThrallType("/zombie.png", "Active thrall ( Zombie )")      // VV 2, 5, 8
+			new ThrallType("/ghost.png", "Active thrall ( Mage )"),       // VV 0, 3, 6
+			new ThrallType("/skeleton.png", "Active thrall ( Ranged )"), // VV 1, 4, 7
+			new ThrallType("/zombie.png", "Active thrall ( Melee )")      // VV 2, 5, 8
 	};
 
 	private final List<MessageHandler> gameMessageIconLockHandlers = Arrays.asList(
@@ -74,6 +74,15 @@ public class ArceuusTimersPlugin extends Plugin
 			new MessageHandler("You resurrect a greater ghostly thrall.", false, this::createThrall),
 			new MessageHandler("You resurrect a greater skeletal thrall.", false, this::createThrall),
 			new MessageHandler("You resurrect a greater zombified thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a lesser impish mage thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a lesser impish ranged thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a lesser impish melee thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a superior impish mage thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a superior impish ranged thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a superior impish melee thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a greater impish mage thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a greater impish ranged thrall.", false, this::createThrall),
+			new MessageHandler("You resurrect a greater impish melee thrall.", false, this::createThrall),
 			new MessageHandler("thrall returns to the grave.", true, this::closeThrallInfoBox),
 			new MessageHandler("Your Ward of Arceuus has expired.", false, () -> expiredGameMessage(ArceuusSpell.WARD)),
 			new MessageHandler("Your Shadow Veil has faded away.", false, () -> expiredGameMessage(ArceuusSpell.SHADOW)),
