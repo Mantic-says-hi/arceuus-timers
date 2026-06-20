@@ -2,19 +2,21 @@ package com.arceuustimers.controllers;
 
 import com.arceuustimers.ArceuusTimersInfobox;
 import com.arceuustimers.ArceuusTimersPlugin;
+import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
-import net.runelite.client.util.ImageUtil;
-import java.awt.image.BufferedImage;
 
 public class DeathChargeController extends SpellController {
-	private ArceuusTimersInfobox secondBox; // second infobox for charge 2
-	private int currentCharges; // track current varbit value
-    private boolean stacked = false;
+	private ArceuusTimersInfobox secondBox;
+	private int currentCharges;
+	private boolean stacked;
+
 	public DeathChargeController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin) {
 		super(fileName, cooldown, tooltip, manager, plugin);
-		this.secondBox = null;
-		this.currentCharges = 0;
-        this.stacked = plugin.getConfig().stackDeathCharge();
+		this.stacked = plugin.getConfig().stackDeathCharge();
+	}
+
+	public static DeathChargeController create(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin, Client client) {
+		return new DeathChargeController(fileName, cooldown, tooltip, manager, plugin);
 	}
 
 	@Override
@@ -26,7 +28,7 @@ public class DeathChargeController extends SpellController {
 			if (currentCharges == 0) {
 				createBox(bit);
 			} else if (currentCharges == 2) {
-                if (stacked) box.changeText("1");
+				if (stacked && box != null) box.changeText("1");
 				removeSecondBox();
 			}
 		} else if (bit == 2) {
@@ -40,49 +42,28 @@ public class DeathChargeController extends SpellController {
 		currentCharges = bit;
 	}
 
-
 	protected void createBox(int count) {
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), fileName);
-        if(!stacked) {
-            box = new ArceuusTimersInfobox(
-                    icon,
-                    plugin,
-                    cooldown,
-                    manager,
-                    "Death Charge (1)",
-                    stacked);
-        }
-        else {
-            box = new ArceuusTimersInfobox(
-                    icon,
-                    plugin,
-                    cooldown,
-                    manager,
-                    count == 2 ? "Death Charge's" : "Death Charge",
-                    stacked,
-                    Integer.toString(count));
-        }
+		if (!stacked) {
+			box = new ArceuusTimersInfobox(loadIcon(), plugin, cooldown, "Death Charge (1)", false);
+		} else {
+			box = new ArceuusTimersInfobox(loadIcon(), plugin, cooldown,
+					count == 2 ? "Death Charge's" : "Death Charge", true, Integer.toString(count));
+		}
+		nameBox(box);
 		manager.addInfoBox(box);
 		active = true;
 	}
 
 	private void createSecondBox() {
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), fileName);
-        if (stacked) return;
-        secondBox = new ArceuusTimersInfobox(
-				icon,
-				plugin,
-				cooldown,
-				manager,
-				"Death Charge (2)",
-                false);
+		if (stacked) return;
+		secondBox = new ArceuusTimersInfobox(loadIcon(), plugin, cooldown, "Death Charge (2)", false);
+		nameBox(secondBox);
 		manager.addInfoBox(secondBox);
 	}
 
 	@Override
 	protected void removeBox() {
-		if (box != null)
-		{
+		if (box != null) {
 			manager.removeInfoBox(box);
 			box = null;
 		}
@@ -91,8 +72,7 @@ public class DeathChargeController extends SpellController {
 		currentCharges = 0;
 	}
 
-	private void removeSecondBox()
-	{
+	private void removeSecondBox() {
 		if (secondBox == null) return;
 		manager.removeInfoBox(secondBox);
 		secondBox = null;
@@ -104,30 +84,37 @@ public class DeathChargeController extends SpellController {
 	}
 
 	@Override
-	public void updateTime() {
-		if (box != null) box.decreaseByGameTick();
-		if (secondBox != null) secondBox.decreaseByGameTick();
-
+	public void refreshIcon() {
+		super.refreshIcon();
+		if (secondBox != null) {
+			secondBox.setImage(loadIcon());
+			manager.updateInfoBoxImage(secondBox);
+		}
 	}
 
-    public void reCreate()
-    {
-        if (box == null) return;
-        int charge = currentCharges;
-        shutdown();
-        removeSecondBox();
-        this.stacked = plugin.getConfig().stackDeathCharge();
-        this.currentCharges = charge;
-        if (charge == 1) {
-                createBox(charge);
-        } else if (charge == 2) {
-            if (!stacked) {
-                createBox(charge);
-                createSecondBox();
-            } else {
-                createBox(charge);
-            }
-        }
-    }
+	@Override
+	public void updateTime() {
+		if (box != null) {
+			box.decreaseByGameTick();
+			if (box.cull()) {
+				manager.removeInfoBox(box);
+				box = null;
+			}
+		}
+		if (secondBox != null) {
+			secondBox.decreaseByGameTick();
+			if (secondBox.cull()) removeSecondBox();
+		}
+		if (box == null && secondBox == null) active = false;
+	}
 
+	public void reCreate() {
+		if (box == null && secondBox == null) return;
+		int charges = currentCharges;
+		removeBox();
+		stacked = plugin.getConfig().stackDeathCharge();
+		currentCharges = charges;
+		if (charges >= 1) createBox(charges);
+		if (charges == 2 && !stacked) createSecondBox();
+	}
 }
