@@ -1,50 +1,31 @@
 package com.arceuustimers.controllers;
 
 import com.arceuustimers.ArceuusTimersPlugin;
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 
-public class CorruptionController extends SpellController
-{
-	private boolean iconLock;
-	private static final int VARBIT_DOWN = 0;
-	private static final int VARBIT_UP = 1;
+public class CorruptionController extends SpellController {
+	@Getter
+	@Setter
+	private boolean iconLocked;
 
-	public CorruptionController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin)
-	{
-		super(fileName,cooldown,tooltip,manager,plugin);
-		this.iconLock = false;
+	public CorruptionController(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin) {
+		super(fileName, cooldown, tooltip, manager, plugin);
 	}
 
-	public boolean isIconLocked() {
-		return iconLock;
-	}
-
-	public void setIconLock(boolean iconLock) {
-		this.iconLock = iconLock;
+	public static CorruptionController create(String fileName, double cooldown, String tooltip, InfoBoxManager manager, ArceuusTimersPlugin plugin, Client client) {
+		return new CorruptionController(fileName, cooldown, tooltip, manager, plugin);
 	}
 
 	@Override
-	public void varbitChange(int bit)
-	{
-		if( bit == VARBIT_UP && !super.getActive() ) {
+	public void varbitChange(int bit) {
+		if (bit == VARBIT_UP && !active) {
 			createBox();
-			setIconLock(false);
-		}
-		else if( bit == VARBIT_DOWN && super.getActive()) {
+			setIconLocked(false);
+		} else if (bit == VARBIT_DOWN && active) {
 			removeBox();
 		}
 	}
-
-	@Override
-	protected void createBox() {
-		super.createBox();
-	}
-
-	@Override
-	protected void removeBox()
-	{
-		super.removeBox();
-	}
-
-
 }
