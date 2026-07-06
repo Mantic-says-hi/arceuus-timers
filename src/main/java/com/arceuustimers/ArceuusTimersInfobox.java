@@ -72,6 +72,7 @@ public class ArceuusTimersInfobox extends InfoBox {
 
 	@Override
 	public Color getTextColor() {
+		if (!text.isEmpty()) return config.textColour();
 		if (timeLeft <= time * LOW_TIME) return config.lowTimeTextColour();
 		return config.textColour();
 	}

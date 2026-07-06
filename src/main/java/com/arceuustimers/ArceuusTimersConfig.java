@@ -88,7 +88,7 @@ public interface ArceuusTimersConfig extends Config {
 	@ConfigItem(
 			section = SECTION_DEATH_CHARGE,
 			keyName = DEATH_CHARGE_SMALL_ICON,
-			name = "Small Icon",
+			name = "Small Death Charge Icon",
 			description = "Use the small 24px sprite centred in the active Death Charge infobox instead of filling the box.",
 			position = 5
 	)
@@ -255,6 +255,16 @@ public interface ArceuusTimersConfig extends Config {
 			position = 8
 	)
 	default boolean impishThrallIcons() { return true; }
+
+	String OLD_THRALL_ICONS = "oldThrallIcons";
+	@ConfigItem(
+			section = SECTION_THRALL,
+			keyName = OLD_THRALL_ICONS,
+			name = "Old Icons",
+			description = "Use the thrall and cooldown icons from before the 3.1 icon rework. Impish icons are unaffected.",
+			position = 9
+	)
+	default boolean oldThrallIcons() { return false; }
 
 	@ConfigSection(
 			name = "Other Spells",

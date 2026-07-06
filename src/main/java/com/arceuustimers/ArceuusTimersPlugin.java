@@ -144,6 +144,7 @@ public class ArceuusTimersPlugin extends Plugin {
 		initialSpellVarbits();
 		applyCooldownIcons();
 		applyDeathChargeIcon();
+		applyThrallCooldownIcon();
 		controllers.get(ArceuusSpell.MARK_COOLDOWN).setDarkenIcon(true);
 		overlayManager.add(deathChargeEffectOverlay);
 		//Register at the front to intercept the drag before the click reaches the game
@@ -210,6 +211,10 @@ public class ArceuusTimersPlugin extends Plugin {
 				return;
 			case ArceuusTimersConfig.IMPISH_THRALL_ICONS:
 				applyThrallIcon();
+				return;
+			case ArceuusTimersConfig.OLD_THRALL_ICONS:
+				applyThrallIcon();
+				applyThrallCooldownIcon();
 				return;
 			case ArceuusTimersConfig.SHOW_SHADOW_VEIL:
 				if (!config.showShadowVeilCooldown() && !config.showShadowVeil()) {
@@ -290,9 +295,21 @@ public class ArceuusTimersPlugin extends Plugin {
 
 	private void applyThrallIcon() {
 		ThrallController thrall = (ThrallController) controllers.get(ArceuusSpell.THRALL);
-		String base = thrall.getFileName().replace("_imp.png", ".png");
-		thrall.setFileName(impishThrall && config.impishThrallIcons() ? base.replace(".png", "_imp.png") : base);
+		String base = thrall.getFileName().replace("_imp.png", ".png").replace("_old.png", ".png");
+		if (impishThrall && config.impishThrallIcons()) {
+			thrall.setFileName(base.replace(".png", "_imp.png"));
+		} else if (config.oldThrallIcons()) {
+			thrall.setFileName(base.replace(".png", "_old.png"));
+		} else {
+			thrall.setFileName(base);
+		}
 		thrall.refreshIcon();
+	}
+
+	private void applyThrallCooldownIcon() {
+		SpellController cooldown = controllers.get(ArceuusSpell.THRALL_COOLDOWN);
+		cooldown.setFileName(config.oldThrallIcons() ? "/thrall_cooldown_old.png" : "/thrall_cooldown.png");
+		cooldown.refreshIcon();
 	}
 
 	@Subscribe
