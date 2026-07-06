@@ -15,14 +15,18 @@ import lombok.extern.slf4j.Slf4j;
 
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.KeyCode;
 import net.runelite.api.NPC;
+import net.runelite.api.MenuAction;
 import net.runelite.api.Player;
+import net.runelite.api.Point;
 import net.runelite.api.gameval.SpotanimID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.events.ActorDeath;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.GraphicChanged;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.callback.ClientThread;
@@ -42,6 +46,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.util.Text;
 
+import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -77,6 +82,8 @@ public class ArceuusTimersPlugin extends Plugin {
 		new ThrallType("/zombie.png", "Active thrall ( Melee )")      // VV 2, 5, 8
 	};
 
+	private boolean impishThrall;
+
 	private final List<MessageHandler> gameMessageHandlers = Arrays.asList(
 		new MessageHandler("You can only cast corruption spells every 30 seconds.", false, this::gameMessageCorrLockRelease),
 		new MessageHandler("thrall returns to the grave.", true, this::closeThrallInfoBox),
@@ -98,6 +105,9 @@ public class ArceuusTimersPlugin extends Plugin {
 
 	@Inject
 	private ArceuusTimersConfig config;
+
+	@Inject
+	private ConfigManager configManager;
 
 	@Inject
 	private InfoBoxManager infoBoxManager;
@@ -132,7 +142,8 @@ public class ArceuusTimersPlugin extends Plugin {
 	protected void startUp() throws Exception {
 		createSpellControllers();
 		initialSpellVarbits();
-		applyDeathChargeCooldownIcon();
+		applyCooldownIcons();
+		applyDeathChargeIcon();
 		controllers.get(ArceuusSpell.MARK_COOLDOWN).setDarkenIcon(true);
 		overlayManager.add(deathChargeEffectOverlay);
 		//Register at the front to intercept the drag before the click reaches the game
@@ -192,10 +203,13 @@ public class ArceuusTimersPlugin extends Plugin {
 				updateDeathChargeBoxes();
 				return;
 			case ArceuusTimersConfig.DARK_DEATH_CHARGE_COOLDOWN:
-				applyDeathChargeCooldownIcon();
+				applyCooldownIcons();
 				return;
-			case ArceuusTimersConfig.SPRITE_SIZED_ICONS:
-				refreshAllIcons();
+			case ArceuusTimersConfig.DEATH_CHARGE_SMALL_ICON:
+				applyDeathChargeIcon();
+				return;
+			case ArceuusTimersConfig.IMPISH_THRALL_ICONS:
+				applyThrallIcon();
 				return;
 			case ArceuusTimersConfig.SHOW_SHADOW_VEIL:
 				if (!config.showShadowVeilCooldown() && !config.showShadowVeil()) {
@@ -255,16 +269,30 @@ public class ArceuusTimersPlugin extends Plugin {
 		deathCharge.setVisible(config.showDeathChargeActive());
 	}
 
-	private void applyDeathChargeCooldownIcon() {
-		SpellController cooldown = controllers.get(ArceuusSpell.CHARGE_COOLDOWN);
+	private void applyCooldownIcons() {
 		boolean dark = config.darkDeathChargeCooldown();
-		cooldown.setDarkenIcon(dark);
-		cooldown.setFileName(dark ? "/death_charge.png" : "/death_charge_cooldown.png");
+		applyCooldownIcon(ArceuusSpell.CHARGE_COOLDOWN, dark, "/death_charge_cooldown_black.png", "/death_charge_cooldown.png");
+		applyCooldownIcon(ArceuusSpell.SHADOW_COOLDOWN, dark, "/shadow_veil_cooldown_black.png", "/shadow_veil_cooldown.png");
+		applyCooldownIcon(ArceuusSpell.WARD_COOLDOWN, dark, "/ward_cooldown_black.png", "/ward_cooldown.png");
+	}
+
+	private void applyCooldownIcon(ArceuusSpell spell, boolean dark, String darkFileName, String fileName) {
+		SpellController cooldown = controllers.get(spell);
+		cooldown.setFileName(dark ? darkFileName : fileName);
 		cooldown.refreshIcon();
 	}
 
-	private void refreshAllIcons() {
-		for (SpellController controller : controllers.values()) controller.refreshIcon();
+	private void applyDeathChargeIcon() {
+		SpellController charge = controllers.get(ArceuusSpell.CHARGE);
+		charge.setFileName(config.deathChargeSmallIcon() ? "/death_charge_small.png" : "/death_charge.png");
+		charge.refreshIcon();
+	}
+
+	private void applyThrallIcon() {
+		ThrallController thrall = (ThrallController) controllers.get(ArceuusSpell.THRALL);
+		String base = thrall.getFileName().replace("_imp.png", ".png");
+		thrall.setFileName(impishThrall && config.impishThrallIcons() ? base.replace(".png", "_imp.png") : base);
+		thrall.refreshIcon();
 	}
 
 	@Subscribe
@@ -395,6 +423,7 @@ public class ArceuusTimersPlugin extends Plugin {
 		String message = event.getMessage().replaceAll("<col=[a-z0-9]+>", "").replaceAll("</col>", "");
 
 		if (message.startsWith(RESURRECT_PREFIX) && message.endsWith(RESURRECT_SUFFIX)) {
+			impishThrall = message.contains("impish");
 			if (config.showThrall()) {
 				createThrall();
 				log.debug("ARCEUUS TIMERS - Thrall resurrect message handled: {}", message);
@@ -416,6 +445,46 @@ public class ArceuusTimersPlugin extends Plugin {
 		String option = cast.getMenuTarget().replaceAll("<col=[a-z0-9]+>", "").replaceAll("</col>", "");
 		Runnable handler = menuOptionHandlers.get(option);
 		if (handler != null) handler.run();
+	}
+
+	@Subscribe
+	public void onMenuOpened(MenuOpened event) {
+		if (!config.showDeathChargeOnPlayer()) return;
+		if (!client.isKeyPressed(KeyCode.KC_SHIFT)) return;
+		Rectangle bounds = deathChargeEffectOverlay.getLocalIconBounds();
+		if (bounds == null) return;
+		Point mouse = client.getMouseCanvasPosition();
+		if (mouse == null || !bounds.contains(mouse.getX(), mouse.getY())) return;
+
+		boolean reposition = config.deathChargeReposition();
+		String target = "Death Charge icon";
+
+		if (reposition) {
+			client.getMenu().createMenuEntry(-1)
+				.setOption("Reset position")
+				.setTarget(target)
+				.setType(MenuAction.RUNELITE)
+				.onClick(e -> {
+					configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.DEATH_CHARGE_OFFSET_X, 0);
+					configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.DEATH_CHARGE_OFFSET_Y, 0);
+				});
+		}
+
+		client.getMenu().createMenuEntry(-1)
+			.setOption(reposition ? "Stop repositioning" : "Reposition")
+			.setTarget(target)
+			.setType(MenuAction.RUNELITE)
+			.onClick(e -> configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.DEATH_CHARGE_REPOSITION, !reposition));
+
+		client.getMenu().createMenuEntry(-1)
+			.setOption("Hide")
+			.setTarget(target)
+			.setType(MenuAction.RUNELITE)
+			.onClick(e -> {
+				configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.SHOW_DEATH_CHARGE_ON_PLAYER, false);
+				configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.SHOW_DEATH_CHARGE_PARTY, false);
+				configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.SHOW_DEATH_CHARGE_OTHERS, false);
+			});
 	}
 
 	private void gameMessageCorrLockRelease() {
@@ -441,6 +510,7 @@ public class ArceuusTimersPlugin extends Plugin {
 	}
 
 	private void createThrall() {
+		applyThrallIcon();
 		ThrallController thrall = (ThrallController) controllers.get(ArceuusSpell.THRALL);
 		thrall.createThrall();
 	}

@@ -2,7 +2,6 @@ package com.arceuustimers.controllers;
 
 import com.arceuustimers.ArceuusTimersInfobox;
 import com.arceuustimers.ArceuusTimersPlugin;
-import com.arceuustimers.IconUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
@@ -15,11 +14,11 @@ public abstract class SpellController {
 	protected static final int VARBIT_DOWN = 0;
 
 	private static final float DARKEN_SCALE = 0f;
-	private static final int SPRITE_SIZE = 25;
 
 	@Getter
 	protected boolean active;
 	protected ArceuusTimersInfobox box;
+	@Getter
 	@Setter
 	protected String fileName;
 	@Setter
@@ -61,16 +60,7 @@ public abstract class SpellController {
 
 	protected BufferedImage loadIcon() {
 		BufferedImage icon = ImageUtil.loadImageResource(getClass(), fileName);
-		if (plugin.getConfig().spriteSizedIcons()) icon = spriteSize(icon);
 		return darkenIcon ? ImageUtil.luminanceScale(icon, DARKEN_SCALE) : icon;
-	}
-
-	private static BufferedImage spriteSize(BufferedImage image) {
-		int largestSide = Math.max(image.getWidth(), image.getHeight());
-		if (largestSide <= SPRITE_SIZE) return image;
-		int width = image.getWidth() * SPRITE_SIZE / largestSide;
-		int height = image.getHeight() * SPRITE_SIZE / largestSide;
-		return IconUtil.smoothDownscale(image, width, height);
 	}
 
 	public void refreshIcon() {

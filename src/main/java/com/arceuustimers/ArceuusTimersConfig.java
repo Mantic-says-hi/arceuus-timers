@@ -38,12 +38,20 @@ public interface ArceuusTimersConfig extends Config {
 	String GROUP = "arceuustimers";
 
 	@ConfigSection(
-			name = "Death Charge",
-			description = "Death charge options.",
+			name = "Death Charge Infobox",
+			description = "Death Charge infobox timers.",
 			position = 1,
 			closedByDefault = true
 	)
 	String SECTION_DEATH_CHARGE = "deathCharge";
+
+	@ConfigSection(
+			name = "Death Charge On Player",
+			description = "Death Charge icons drawn on players.",
+			position = 2,
+			closedByDefault = true
+	)
+	String SECTION_DEATH_CHARGE_PLAYER = "deathChargePlayer";
 
 	String SHOW_DEATH_CHARGE = "showDeathChargeActive";
 	@ConfigItem(
@@ -76,98 +84,139 @@ public interface ArceuusTimersConfig extends Config {
     )
     default boolean stackDeathCharge() { return false; }
 
-	String DARK_DEATH_CHARGE_COOLDOWN = "darkDeathChargeCooldown";
+	String DEATH_CHARGE_SMALL_ICON = "deathChargeSmallIcon";
 	@ConfigItem(
 			section = SECTION_DEATH_CHARGE,
-			keyName = DARK_DEATH_CHARGE_COOLDOWN,
-			name = "Dark Cooldown Icon",
-			description = "Use a blacked-out Death Charge icon for the cooldown timer, like the standard 'Timers' plugin.",
-			position = 30
+			keyName = DEATH_CHARGE_SMALL_ICON,
+			name = "Small Icon",
+			description = "Use the small 24px sprite centred in the active Death Charge infobox instead of filling the box.",
+			position = 5
 	)
-	default boolean darkDeathChargeCooldown() { return false; }
+	default boolean deathChargeSmallIcon() { return false; }
 
 	String SHOW_DEATH_CHARGE_ON_PLAYER = "showDeathChargeOnPlayer";
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = SHOW_DEATH_CHARGE_ON_PLAYER,
 			name = "Show On Player",
-			description = "Draw the Death Charge icon above your character while Death Charge is active. Shows a second offset icon when you have two charges.",
-			position = 31
+			description = "Draw the Death Charge icon above your character while Death Charge is active.",
+			position = 1
 	)
 	default boolean showDeathChargeOnPlayer() { return true; }
 
+	String DEATH_CHARGE_COUNT_SUBSCRIPT = "deathChargeCountSubscript";
+	@ConfigItem(
+			section = SECTION_DEATH_CHARGE_PLAYER,
+			keyName = DEATH_CHARGE_COUNT_SUBSCRIPT,
+			name = "One Charge Icon",
+			description = "Only ever draw one icon on your character: a small '2' shows under its right side while you hold two charges and goes away when a charge is used. Turn off to stack a second offset icon instead.",
+			position = 4
+	)
+	default boolean deathChargeCountSubscript() { return true; }
+
+	String DEATH_CHARGE_TEXT_SIZE = "deathChargeTextSize";
+	@Range(min = 8, max = 32)
+	@ConfigItem(
+			section = SECTION_DEATH_CHARGE_PLAYER,
+			keyName = DEATH_CHARGE_TEXT_SIZE,
+			name = "Text Size",
+			description = "Size of the charge number, stacked player count and '?' drawn beside the on-player icon. The font follows the RuneLite infobox font setting.",
+			position = 5
+	)
+	default int deathChargeTextSize() { return 16; }
+
+	String DEATH_CHARGE_TEXT_COLOUR = "deathChargeTextColour";
+	@ConfigItem(
+			section = SECTION_DEATH_CHARGE_PLAYER,
+			keyName = DEATH_CHARGE_TEXT_COLOUR,
+			name = "Charge Text Colour",
+			description = "Colour of the charge number and '?' under the icon's right side.",
+			position = 6
+	)
+	default Color deathChargeTextColour() { return new Color(0xE4E4E4); }
+
+	String DEATH_CHARGE_COUNT_COLOUR = "deathChargeCountColour";
+	@ConfigItem(
+			section = SECTION_DEATH_CHARGE_PLAYER,
+			keyName = DEATH_CHARGE_COUNT_COLOUR,
+			name = "Player Count Colour",
+			description = "Colour of the stacked player count under the icon's left side.",
+			position = 7
+	)
+	default Color deathChargeCountColour() { return new Color(0x9CFFDB); }
+
 	String SHOW_DEATH_CHARGE_PARTY = "showDeathChargeParty";
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = SHOW_DEATH_CHARGE_PARTY,
 			name = "Show On Party Members",
 			description = "Draw Death Charge icons on RuneLite Party members who have Death Charge active. They need this plugin too.",
-			position = 32
+			position = 2
 	)
 	default boolean showDeathChargeParty() { return true; }
 
 	String SHOW_DEATH_CHARGE_OTHERS = "showDeathChargeOthers";
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = SHOW_DEATH_CHARGE_OTHERS,
 			name = "Detect Other Casters",
 			description = "Draw a Death Charge icon on any player you see cast it, even if they aren't in your party or don't have the plugin. The count is a guess, shown with a '?', and clears on a nearby kill or when the spell would expire.",
-			position = 33
+			position = 3
 	)
 	default boolean showDeathChargeOthers() { return true; }
 
 	String DEATH_CHARGE_ANCHOR = "deathChargeAnchor";
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = DEATH_CHARGE_ANCHOR,
 			name = "Icon Anchor Point",
 			description = "Where on your character the Death Charge icon is anchored.",
-			position = 34
+			position = 8
 	)
 	default DeathChargeAnchor deathChargeAnchor() { return DeathChargeAnchor.NECK; }
 
 	String DEATH_CHARGE_SIZE_OFFSET = "deathChargeSizeOffset";
 	@Range(min = -16, max = 32)
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = DEATH_CHARGE_SIZE_OFFSET,
 			name = "Size Offset",
 			description = "Grow or shrink the on-player icon by this many pixels.",
-			position = 35
+			position = 9
 	)
 	default int deathChargeSizeOffset() { return 0; }
-
-	String DEATH_CHARGE_REPOSITION = "deathChargeReposition";
-	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
-			keyName = DEATH_CHARGE_REPOSITION,
-			name = "Reposition Mode",
-			description = "While on, a preview icon shows on your character and you can drag it with the left mouse button to position it. Right-click the icon to reset the offset to 0,0.",
-			position = 38
-	)
-	default boolean deathChargeReposition() { return false; }
 
 	String DEATH_CHARGE_OFFSET_Y = "deathChargeOffsetY";
 	@Range(min = -100, max = 100)
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = DEATH_CHARGE_OFFSET_Y,
 			name = "Y-Offset",
 			description = "Vertical offset in pixels from the anchor point. Negative moves the icon up, positive down.",
-			position = 36
+			position = 10
 	)
 	default int deathChargeOffsetY() { return 0; }
 
 	String DEATH_CHARGE_OFFSET_X = "deathChargeOffsetX";
 	@Range(min = -100, max = 100)
 	@ConfigItem(
-			section = SECTION_DEATH_CHARGE,
+			section = SECTION_DEATH_CHARGE_PLAYER,
 			keyName = DEATH_CHARGE_OFFSET_X,
 			name = "X-Offset",
 			description = "Horizontal offset in pixels from the anchor point. Negative moves the icon left, positive right.",
-			position = 37
+			position = 11
 	)
-	default int deathChargeOffsetX() { return -20; }
+	default int deathChargeOffsetX() { return 0; }
+
+	String DEATH_CHARGE_REPOSITION = "deathChargeReposition";
+	@ConfigItem(
+			section = SECTION_DEATH_CHARGE_PLAYER,
+			keyName = DEATH_CHARGE_REPOSITION,
+			name = "Reposition Mode",
+			description = "While on, a preview icon shows on your character and you can drag it with the left mouse button to position it. Shift-right-click the icon for reposition, reset and hide options.",
+			position = 12
+	)
+	default boolean deathChargeReposition() { return false; }
 
 	@ConfigSection(
 			name = "Resurrected Thralls",
@@ -196,6 +245,16 @@ public interface ArceuusTimersConfig extends Config {
 			position = 7
 	)
 	default boolean showThrallCooldown() { return true; }
+
+	String IMPISH_THRALL_ICONS = "impishThrallIcons";
+	@ConfigItem(
+			section = SECTION_THRALL,
+			keyName = IMPISH_THRALL_ICONS,
+			name = "Impish Thrall Icons",
+			description = "Use the impish icons when an impish thrall is resurrected. Turn off to keep the classic thrall icons.",
+			position = 8
+	)
+	default boolean impishThrallIcons() { return true; }
 
 	@ConfigSection(
 			name = "Other Spells",
@@ -305,6 +364,16 @@ public interface ArceuusTimersConfig extends Config {
 	)
 	default boolean showVileVigourCooldown() { return true; }
 
+	String SPELLBOOK_SWAP = "spellbookSwap";
+	@ConfigItem(
+			section = SECTION_OTHER,
+			keyName = SPELLBOOK_SWAP,
+			name = "Spellbook Swap Timer",
+			description = "Show time left to cast a spell from the Lunar spell, Spellbook Swap.",
+			position = 19
+	)
+	default boolean spellbookSwapToggle() { return true; }
+
 	String MAIN_TEXT_COLOUR = "mainText";
 	@ConfigItem(
 			keyName = MAIN_TEXT_COLOUR,
@@ -341,23 +410,14 @@ public interface ArceuusTimersConfig extends Config {
 	)
 	default TextFormat textFormat() { return TextFormat.SECONDS; }
 
-	String SPELLBOOK_SWAP = "spellbookSwap";
+	String DARK_DEATH_CHARGE_COOLDOWN = "darkDeathChargeCooldown";
 	@ConfigItem(
-			keyName = SPELLBOOK_SWAP,
-			name = "Spellbook Swap Timer",
-			description = "Show time left to cast a spell from the Lunar spell, Spellbook Swap.",
-			position = 22
-	)
-	default boolean spellbookSwapToggle() { return true; }
-
-	String SPRITE_SIZED_ICONS = "spriteSizedIcons";
-	@ConfigItem(
-			keyName = SPRITE_SIZED_ICONS,
-			name = "Sprite-sized Icons",
-			description = "Scale the icons down to native game sprite size (~25px) with padding, matching other infobox plugins, instead of filling the infobox.",
+			keyName = DARK_DEATH_CHARGE_COOLDOWN,
+			name = "Dark Cooldown Icons",
+			description = "Use blacked-out icons for the Death Charge, Shadow Veil and Ward of Arceuus cooldown timers, like the standard 'Timers' plugin.",
 			position = 32
 	)
-	default boolean spriteSizedIcons() { return false; }
+	default boolean darkDeathChargeCooldown() { return false; }
 
 	String SEPARATE_INFOBOXES = "separateInfoboxes";
 	@ConfigItem(

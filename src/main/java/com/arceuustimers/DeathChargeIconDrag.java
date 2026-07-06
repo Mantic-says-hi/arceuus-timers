@@ -31,21 +31,16 @@ public class DeathChargeIconDrag extends MouseAdapter {
 
 	@Override
 	public MouseEvent mousePressed(MouseEvent e) {
+		if (e.getButton() != MouseEvent.BUTTON1) return e;
 		if (!config.showDeathChargeOnPlayer() || !config.deathChargeReposition()) return e;
 		Rectangle bounds = overlay.getLocalIconBounds();
 		if (bounds == null || !bounds.contains(e.getPoint())) return e;
-		if (e.getButton() == MouseEvent.BUTTON1) {
-			dragging = true;
-			dragStartX = e.getX();
-			dragStartY = e.getY();
-			startOffsetX = config.deathChargeOffsetX();
-			startOffsetY = config.deathChargeOffsetY();
-			e.consume();
-		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.DEATH_CHARGE_OFFSET_X, 0);
-			configManager.setConfiguration(ArceuusTimersConfig.GROUP, ArceuusTimersConfig.DEATH_CHARGE_OFFSET_Y, 0);
-			e.consume();
-		}
+		dragging = true;
+		dragStartX = e.getX();
+		dragStartY = e.getY();
+		startOffsetX = config.deathChargeOffsetX();
+		startOffsetY = config.deathChargeOffsetY();
+		e.consume();
 		return e;
 	}
 
@@ -71,7 +66,7 @@ public class DeathChargeIconDrag extends MouseAdapter {
 
 	@Override
 	public MouseEvent mouseClicked(MouseEvent e) {
-		if (e.getButton() != MouseEvent.BUTTON1 && e.getButton() != MouseEvent.BUTTON3) return e;
+		if (e.getButton() != MouseEvent.BUTTON1) return e;
 		if (!config.showDeathChargeOnPlayer() || !config.deathChargeReposition()) return e;
 		Rectangle bounds = overlay.getLocalIconBounds();
 		if (bounds != null && bounds.contains(e.getPoint())) e.consume();

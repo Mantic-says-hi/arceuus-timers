@@ -10,11 +10,12 @@ every visible detail.
 ## Unique spell icons
 - The RuneLite 'Timers' plugin shows the same icon regardless of the Arceuus spell cast.
   This plugin gives each spell its own icon.
-- Icons are optimised to leave more room for the time-remaining text, improving the visual
-  clarity of the infobox timer.
+- Icons are the native game sprites, drawn pixel-for-pixel with no rescaling blur, and placed
+  to leave room for the time-remaining text below.
 
 ### Unique thrall icons
 - Custom icons for every thrall attack style and subtype
+- Impish thralls get their own icons, with a toggle for the classic ones
 - Custom icon for the thrall re-cast cooldown
 
 ![icons](https://imgur.com/u0rN6DY.png)
@@ -24,21 +25,26 @@ every visible detail.
 - An active Death Charge has no in-game timer, so only the cooldown is timed
 - Optional infobox for the active charge, and an infobox for the cooldown
 - **Stack Death Charge Boxes** combines the active charge infoboxes into one
-- **Dark Cooldown Icon** uses a blacked-out icon for the cooldown, matching the standard
-  'Timers' plugin
+- **Small Icon** uses the small centred sprite in the active charge infobox instead of
+  filling the box
 
 ![charge](https://imgur.com/aKRhIaG.png)
 
 ### On-player tracking
 - **Show On Player** draws the Death Charge icon above your character while it's active,
-  with a second offset icon when you're holding two charges
+  with a small `2` under it while you're holding two charges
+- **One Charge Icon** (on by default) keeps it to a single icon with the number; turn it
+  off to stack a second offset icon instead; the text follows the RuneLite infobox font,
+  with size and per-side colours configurable
 - **Show On Party Members** draws the icon on RuneLite Party members who also run this plugin
 - **Detect Other Casters** draws the icon on any player you *see* cast Death Charge, even if
   they aren't in your party or don't have the plugin. The count is a guess, shown with a `?`,
   and clears on a nearby kill or when the spell would expire.
+- Players stacked on one tile collapse into a single icon, with the number of casters shown
+  under its left side
 - **Positioning** lets you anchor the icon to Head / Neck / Middle / Feet, adjust its placement with X/Y
-  and size offsets, or turn on **Reposition Mode** to drag it into place with the mouse
-  (right-click on the box resets to 0/0)
+  and size offsets, or turn on **Reposition Mode** to drag it into place with the mouse.
+  Shift-right-click the icon to start or stop repositioning, reset the offsets, or hide it.
 
 ## Resurrected Thralls
 - Infobox timer for an active thrall, plus an optional cooldown timer
@@ -66,9 +72,11 @@ The RuneLite 'Timers' plugin doesn't track these at all. This plugin adds them:
     - Minutes
     - Game ticks
 
-### Icon sizing and layout
-- **Sprite-sized Icons** scales the icons down to native game sprite size (~25px) with padding,
-  matching other infobox plugins, instead of filling the infobox
+### Icon style
+- **Dark Cooldown Icons** uses blacked-out icons for the Death Charge, Shadow Veil and
+  Ward of Arceuus cooldowns, matching the standard 'Timers' plugin
+
+### Layout
 - **Separate Infoboxes** gives each timer its own group so they can be detached and positioned
   individually. When off (the default) every timer stays in one group that moves together
 
@@ -80,7 +88,7 @@ Config options exist for every visible part of the plugin:
 - Custom text colour, plus a separate low-time colour
 - Infobox priority (how high or low they sit in the infobox stack)
 - Timer format: seconds, minutes, or game ticks
-- Sprite-sized icons and separate-infobox layout
+- Separate-infobox layout
 - Full Death Charge on-player controls (anchor, offsets, reposition mode)
 
 ## Contact
