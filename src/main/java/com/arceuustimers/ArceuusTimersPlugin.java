@@ -437,7 +437,7 @@ public class ArceuusTimersPlugin extends Plugin {
 	@Subscribe
 	public void onChatMessage(ChatMessage event) {
 		if (!event.getType().equals(ChatMessageType.GAMEMESSAGE)) return;
-		String message = event.getMessage().replaceAll("<col=[a-z0-9]+>", "").replaceAll("</col>", "");
+		String message = Text.removeTags(event.getMessage()).replaceAll("@[^@\\s]+@", "").trim();
 
 		if (message.startsWith(RESURRECT_PREFIX) && message.endsWith(RESURRECT_SUFFIX)) {
 			impishThrall = message.contains("impish");
