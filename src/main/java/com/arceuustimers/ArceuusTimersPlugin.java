@@ -85,12 +85,12 @@ public class ArceuusTimersPlugin extends Plugin {
 	private boolean impishThrall;
 
 	private final List<MessageHandler> gameMessageHandlers = Arrays.asList(
-		new MessageHandler("You can only cast corruption spells every 30 seconds.", false, this::gameMessageCorrLockRelease),
-		new MessageHandler("thrall returns to the grave.", true, this::closeThrallInfoBox),
-		new MessageHandler("Your Ward of Arceuus has expired.", false, () -> expiredGameMessage(ArceuusSpell.WARD)),
-		new MessageHandler("Your Shadow Veil has faded away.", false, () -> expiredGameMessage(ArceuusSpell.SHADOW)),
-		new MessageHandler("You have placed a Mark of Darkness upon yourself.", false, this::gameMessageMarkOfDarkness),
-		new MessageHandler("Your Mark of Darkness has faded away.", false, () -> expiredGameMessage(ArceuusSpell.MARK))
+		new MessageHandler("You can only cast corruption spells every 30 seconds.", this::gameMessageCorrLockRelease),
+		new MessageHandler("thrall returns to the grave.", this::closeThrallInfoBox),
+		new MessageHandler("Your Ward of Arceuus has expired.", () -> expiredGameMessage(ArceuusSpell.WARD)),
+		new MessageHandler("Your Shadow Veil has faded away.", () -> expiredGameMessage(ArceuusSpell.SHADOW)),
+		new MessageHandler("You have placed a Mark of Darkness upon yourself.", this::gameMessageMarkOfDarkness),
+		new MessageHandler("Your Mark of Darkness has faded away.", () -> expiredGameMessage(ArceuusSpell.MARK))
 	);
 
 	private final Map<String, Runnable> menuOptionHandlers = ImmutableMap.of(
@@ -219,6 +219,7 @@ public class ArceuusTimersPlugin extends Plugin {
 			case ArceuusTimersConfig.SHOW_SHADOW_VEIL:
 				if (!config.showShadowVeilCooldown() && !config.showShadowVeil()) {
 					updateConfigChange(false, VarbitID.ARCEUUS_SHADOW_VEIL_COOLDOWN, ArceuusSpell.SHADOW_COOLDOWN);
+					updateConfigChange(false, VarbitID.ARCEUUS_SHADOW_VEIL_ACTIVE, ArceuusSpell.SHADOW);
 				} else if (!config.showShadowVeilCooldown() && config.showShadowVeil()) {
 					//Need to force a true here for the cooldown in case it is not on, otherwise shadow veil
 					//won't function properly if it is recast after a cooldown while it is still active
@@ -234,6 +235,13 @@ public class ArceuusTimersPlugin extends Plugin {
 				} else {
 					updateConfigChange(config.showShadowVeilCooldown(), VarbitID.ARCEUUS_SHADOW_VEIL_COOLDOWN, ArceuusSpell.SHADOW_COOLDOWN);
 				}
+				return;
+			case ArceuusTimersConfig.SHOW_WARD_OF_ARCEUUS:
+				//Ward has no active varbit, so its timer relies on the cooldown varbit staying tracked
+				if (!config.showWardOfArceuusCooldown()) {
+					updateConfigChange(config.showWardOfArceuus(), VarbitID.ARCEUUS_WARD_COOLDOWN, ArceuusSpell.WARD_COOLDOWN);
+				}
+				if (!config.showWardOfArceuus()) controllers.get(ArceuusSpell.WARD).shutdown();
 				return;
 			case ArceuusTimersConfig.SHOW_WARD_OF_ARCEUUS_COOLDOWN:
 				if (config.showWardOfArceuus() && !config.showWardOfArceuusCooldown()) {
@@ -429,17 +437,18 @@ public class ArceuusTimersPlugin extends Plugin {
 		//These spells have cases where the timer relies on the cooldown varbit to re-trigger when already active
 		//These boolean checks are to make sure the cooldown infoboxes do not get created if the config for
 		//them is turned off but the program is allowed to process actions based off the cooldown varbits.
-		boolean blockVeilCooldown = config.showShadowVeil() && !config.showShadowVeilCooldown() && varbit == VarbitID.ARCEUUS_SHADOW_VEIL_COOLDOWN;
-		boolean blockWardCooldown = config.showWardOfArceuus() && !config.showWardOfArceuusCooldown() && varbit == VarbitID.ARCEUUS_WARD_COOLDOWN;
+		boolean blockVeilCooldown = !config.showShadowVeilCooldown() && varbit == VarbitID.ARCEUUS_SHADOW_VEIL_COOLDOWN;
+		boolean blockWardCooldown = !config.showWardOfArceuusCooldown() && varbit == VarbitID.ARCEUUS_WARD_COOLDOWN;
 		return !(blockVeilCooldown || blockWardCooldown);
 	}
 
 	@Subscribe
 	public void onChatMessage(ChatMessage event) {
 		if (!event.getType().equals(ChatMessageType.GAMEMESSAGE)) return;
-		String message = Text.removeTags(event.getMessage()).replaceAll("@[^@\\s]+@", "").trim();
+		//The client can escape @ as <at>, so restore those before stripping the @xxx@ format tags
+		String message = Text.removeTags(event.getMessage().replace("<at>", "@")).replaceAll("@[^@\\s]+@", "").trim();
 
-		if (message.startsWith(RESURRECT_PREFIX) && message.endsWith(RESURRECT_SUFFIX)) {
+		if (message.contains(RESURRECT_PREFIX) && message.endsWith(RESURRECT_SUFFIX)) {
 			impishThrall = message.contains("impish");
 			if (config.showThrall()) {
 				createThrall();
@@ -449,7 +458,7 @@ public class ArceuusTimersPlugin extends Plugin {
 		}
 
 		for (MessageHandler handler : gameMessageHandlers) {
-			if (handler.isSuffix ? message.endsWith(handler.message) : message.equals(handler.message)) {
+			if (message.endsWith(handler.message)) {
 				handler.action.run();
 				log.debug("ARCEUUS TIMERS - Chat message handled: {}", message);
 				return;
@@ -577,12 +586,10 @@ public class ArceuusTimersPlugin extends Plugin {
 
 	private static class MessageHandler {
 		final String message;
-		final boolean isSuffix;
 		final Runnable action;
 
-		MessageHandler(String message, boolean isSuffix, Runnable action) {
+		MessageHandler(String message, Runnable action) {
 			this.message = message;
-			this.isSuffix = isSuffix;
 			this.action = action;
 		}
 	}
